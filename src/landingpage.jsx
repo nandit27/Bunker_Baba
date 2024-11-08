@@ -6,8 +6,11 @@ import FeatureCards from './featurecards';
 import FAQSection from './faq';
 import Footer from './footer';
 import AnalyticsSection from './analytics';
+import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -50,6 +53,7 @@ const LandingPage = () => {
         <div className="flex justify-center gap-4">
           <Button 
             className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-base"
+            onClick={() => navigate('/calculator')}
           >
             Get Started
           </Button>
