@@ -42,12 +42,12 @@ const LandingPage = () => {
         </div>
 
         <h1 className="text-6xl font-bold mb-4 text-[#1D1D1F]">
-          Ship sites with style.
+          Ace The Art Of Bunking Wisely.
         </h1>
         <p className="text-xl text-gray-600 mb-8">
-          Go from design to site with Framer,
+          Lectures ka hisaab,
           <br />
-          the web builder for creative pros.
+          Baba se poocho jawaab.
         </p>
 
         <div className="flex justify-center gap-4">
@@ -55,7 +55,7 @@ const LandingPage = () => {
             className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-base"
             onClick={() => navigate('/calculator')}
           >
-            Get Started
+            Shuru Karo !
           </Button>
           <Button 
             variant="outline"

@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 
 const Footer = () => {
   const footerLinks = {
-    Application: ['Overview', 'Features', 'Export', 'Updates'],
-    Company: ['About', 'Careers', 'Contact'],
-    Legal: ['Terms', 'Privacy', 'Security']
+    Application: ['Dashboard', 'Attendance Tracker', 'Analytics', 'Updates'],
+    Company: ['About Us', 'Team', 'Contact'],
+    Legal: ['Terms of Use', 'Privacy Policy', 'Data Security']
   };
 
   return (
@@ -46,7 +46,7 @@ const Footer = () => {
         
         <div className="pt-8 border-t border-gray-200">
           <p className="text-sm text-gray-600">
-            © Bunker Grim, {new Date().getFullYear()}
+            © Bunker Baba, {new Date().getFullYear()}
           </p>
         </div>
       </div>

@@ -10,16 +10,16 @@ import {
 const FAQSection = () => {
   const faqs = [
     {
-      question: "What is Framer?",
-      answer: "Framer is a powerful web design and development platform that allows creative professionals to build and ship custom websites with ease."
+      question: "What is Bunker Baba?",
+      answer: "Bunker Baba is an intelligent attendance tracking system designed specifically for college students. It helps you monitor your attendance, predict attendance patterns, and manage your academic attendance requirements effectively."
     },
     {
       question: "Is it easy to use?",
-      answer: "Yes! Framer is designed to be intuitive while providing professional-grade features. Our visual interface makes it simple to create stunning websites."
+      answer: "Absolutely! Simply upload your attendance records or use our OCR feature to scan them. Our intuitive interface makes it easy to track, analyze, and plan your attendance with just a few clicks."
     },
     {
-      question: "Do I need to code?",
-      answer: "No coding is required to create websites with Framer, though developers can extend functionality using custom code when needed."
+      question: "Do I need technical knowledge?",
+      answer: "Not at all! Bunker Baba is designed to be user-friendly for all students. Whether you're tech-savvy or not, you can easily navigate and use all features without any technical expertise."
     }
   ];
 

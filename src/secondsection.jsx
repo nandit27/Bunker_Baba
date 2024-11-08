@@ -25,17 +25,16 @@ const SecondSection = () => {
         <div className="flex flex-col justify-center px-4 md:px-8">
           <div className="space-y-8"> {/* Increased vertical spacing between elements */}
             <h2 className="text-4xl font-semibold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
-              Double Click to Update Anything
+            Track Your Bunks, Baba Style!
             </h2>
             
             <p className="text-gray-600 text-lg leading-relaxed">
-              Double click the image placeholders to add images. Do the same for any text, 
-              then tweak styles and publish.
+            Baba ke saath stay updated! Easily record your attendance and keep track of safe bunks, all in one place.
             </p>
             
             <div className="flex gap-4 pt-4">
               <Button className="bg-black text-white hover:bg-gray-800 transition-colors hover:shadow-lg">
-                Get Started
+              Update Now
               </Button>
               <Button variant="outline" className="border-gray-200 hover:bg-gray-50 transition-colors">
                 Learn More
