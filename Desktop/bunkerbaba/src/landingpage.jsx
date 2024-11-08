@@ -2,10 +2,6 @@ import React from 'react';
 import SecondSection from './secondsection';
 import baba from './assets/baba.png';
 import { Button } from "@/components/ui/button";
-import FeatureCards from './featurecards';
-import FAQSection from './faq';
-import Footer from './footer';
-import AnalyticsSection from './analytics';
 
 const LandingPage = () => {
   return (
@@ -64,19 +60,6 @@ const LandingPage = () => {
 
       {/* Second Section */}
       <SecondSection />
-      
-      {/* Feature Cards */}
-      <FeatureCards />
-
-      {/* Analytics */}
-      <AnalyticsSection/>
-
-      {/* FAQ Section */}
-      <FAQSection />
-
-      {/* Footer */}
-      <Footer />
-   
     </div>
   );
 };
