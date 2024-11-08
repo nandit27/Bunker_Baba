@@ -1,14 +1,18 @@
 import React from 'react';
+import SecondSection from './secondsection';
 import baba from './assets/baba.png';
-
+import { Button } from "@/components/ui/button";
+import FeatureCards from './featurecards';
+import FAQSection from './faq';
+import Footer from './footer';
+import AnalyticsSection from './analytics';
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="flex items-center justify-between p-4 bg-white">
+      <nav className="flex items-center justify-between p-4">
         <div className="flex items-center">
-          {/* Logo */}
           <div className="w-8 h-8 bg-black rounded-full"></div>
           <span className="ml-2 text-xl font-semibold">Framer</span>
         </div>
@@ -21,37 +25,58 @@ const LandingPage = () => {
         </div>
       </nav>
 
-      {/* Main Content */}
+      {/* Hero Section */}
       <main className="container mx-auto px-4 pt-16 text-center">
-        {/* Add your image here */}
-        <div className="flex justify-center mb-8">
+        {/* Character container with floating animation */}
+        <div className="relative flex justify-center mb-16">        
+          {/* Floating character */}
           <img 
-            src={baba} 
+            src={baba}
             alt="Zen character" 
-            className="w-64 h-64 object-contain"
+            className="w-96 h-96 object-contain relative animate-float"
           />
+          
         </div>
 
-        {/* Hero Text */}
-        <h1 className="text-6xl font-bold mb-4 leading-tight">
+        <h1 className="text-6xl font-bold mb-4 text-[#1D1D1F]">
           Ship sites with style.
         </h1>
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          Go from design to site with Framer, 
+        <p className="text-xl text-gray-600 mb-8">
+          Go from design to site with Framer,
           <br />
           the web builder for creative pros.
         </p>
 
-        {/* CTA Buttons */}
         <div className="flex justify-center gap-4">
-          <button className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors">
+          <Button 
+            className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-base"
+          >
             Get Started
-          </button>
-          <button className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+          </Button>
+          <Button 
+            variant="outline"
+            className="px-6 py-3 bg-transparent border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-base"
+          >
             Learn More
-          </button>
+          </Button>
         </div>
       </main>
+
+      {/* Second Section */}
+      <SecondSection />
+      
+      {/* Feature Cards */}
+      <FeatureCards />
+
+      {/* Analytics */}
+      <AnalyticsSection/>
+
+      {/* FAQ Section */}
+      <FAQSection />
+
+      {/* Footer */}
+      <Footer />
+   
     </div>
   );
 };
