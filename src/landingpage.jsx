@@ -17,7 +17,7 @@ const LandingPage = () => {
       <nav className="flex items-center justify-between p-4">
         <div className="flex items-center">
           <div className="w-8 h-8 bg-black rounded-full"></div>
-          <span className="ml-2 text-xl font-semibold">Framer</span>
+          <span className="ml-2 text-xl font-semibold">Bunker Baba</span>
         </div>
         
         <div className="flex items-center gap-6">

@@ -37,18 +37,31 @@ const AttendanceCalculator = () => {
 
   const calculateAllowedSkips = async () => {
     setLoading(true);
-    // Call backend API to analyze the attendance screenshot and calculate the allowed skips
-    const response = await fetch('/api/attendance/analyze', {
-      method: 'POST',
-      body: JSON.stringify({ screenshot: attendanceScreenshot, desiredAttendance }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const data = await response.json();
-    setAllowedSkips(data.allowedSkips);
-    setShowResults(true);
-    setLoading(false);
+    const formData = new FormData();
+    formData.append('screenshot', attendanceScreenshot);
+    formData.append('desiredAttendance', desiredAttendance.toString());
+    formData.append('timeFrame', timeFrame);
+
+    try {
+        const response = await fetch('/api/attendance/analyze', {
+            method: 'POST',
+            body: formData,
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('OCR Results:', data);
+        setAllowedSkips(data.allowedSkips);
+        setShowResults(true);
+    } catch (error) {
+        console.error('Error:', error);
+        // Add error handling here
+    } finally {
+        setLoading(false);
+    }
   };
 
   const handleReset = () => {
