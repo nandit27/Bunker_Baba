@@ -1,9 +1,10 @@
+// ocr.js
 import Tesseract from 'tesseract.js';
 
 export async function extractAttendanceData(imageBuffer) {
   try {
     const { data } = await Tesseract.recognize(imageBuffer, 'eng');
-
+    
     const ocrResults = {
       fullText: data.text,
       confidence: data.confidence,
@@ -15,16 +16,11 @@ export async function extractAttendanceData(imageBuffer) {
       paragraphs: data.paragraphs?.map(p => p.text)
     };
 
-    // Parse extracted text into structured attendance data
     const attendanceData = parseAttendanceData(data.text);
     
-    // Aggregate totals across all subjects
-    const totalStats = calculateTotalAttendance(attendanceData);
-
     return {
-      ocrResults: ocrResults.paragraphs,
-      parsedData: attendanceData,
-      totalStats
+      ocrResults,
+      parsedData: attendanceData
     };
   } catch (error) {
     console.error('OCR Error:', error);
@@ -32,7 +28,6 @@ export async function extractAttendanceData(imageBuffer) {
   }
 }
 
-// Parses attendance text to extract subject data
 function parseAttendanceData(text) {
   const lines = text.split('\n').filter(line => line.trim());
   const coursePattern = /(HS|IT|MA)\d+/;
@@ -40,91 +35,57 @@ function parseAttendanceData(text) {
   const subjectData = [];
 
   for (const line of lines) {
-    if (coursePattern.test(line)) {
-      const attendanceMatch = line.match(attendancePattern);
+      if (coursePattern.test(line)) {
+          let totalAttended = 0;
+          let totalClasses = 0;
+          const attendanceMatch = line.match(attendancePattern);
 
-      if (attendanceMatch) {
-        const attended = parseInt(attendanceMatch[1]);
-        const total = parseInt(attendanceMatch[2]);
+          if (attendanceMatch) {
+              const attended = parseInt(attendanceMatch[1]);
+              const total = parseInt(attendanceMatch[2]);
 
-        if (!isNaN(attended) && !isNaN(total)) {
-          const courseMatch = line.match(/((?:HS|IT|MA)\d+(?:\.\d+)?[A-Z\s/-]+)/);
-          const courseCode = courseMatch ? courseMatch[1].trim() : 'Unknown';
-          const type = line.includes('LAB') ? 'LAB' : 'LECT';
+              if (!isNaN(attended) && !isNaN(total)) {
+                  const courseMatch = line.match(/((?:HS|IT|MA)\d+(?:\.\d+)?[A-Z\s/-]+)/);
+                  const courseCode = courseMatch ? courseMatch[1].trim() : 'Unknown';
+                  const type = line.includes('LAB') ? 'LAB' : 'LECT';
 
-          subjectData.push({
-            courseCode,
-            type,
-            attended,
-            total,
-            percentage: parseFloat(((attended / total) * 100).toFixed(2))
-          });
-        }
+                  subjectData.push({
+                      courseCode,
+                      type,
+                      attended,
+                      total,
+                      percentage: parseFloat(((attended / total) * 100).toFixed(2))
+                  });
+
+                  totalAttended += attended;
+                  totalClasses += total;
+              }
+          }
       }
-    }
   }
 
-  return subjectData;
+  // Calculate overall attendance percentage
+  const currentPercentage = totalClasses > 0 ? parseFloat(((totalAttended / totalClasses) * 100).toFixed(2)) : 0;
+
+  return { subjectData, totalClasses, totalAttended, currentPercentage };
 }
 
-// Aggregates attendance totals across all subjects
-function calculateTotalAttendance(subjectData) {
-  const total = subjectData.reduce(
-    (acc, subject) => {
-      acc.totalAttended += subject.attended;
-      acc.totalClasses += subject.total;
-      return acc;
-    },
-    { totalAttended: 0, totalClasses: 0 }
-  );
-
-  total.currentPercentage = parseFloat(((total.totalAttended / total.totalClasses) * 100).toFixed(2));
-  return total;
-}
-
-// Calculates future attendance requirements
-export function calculateRequiredAttendance(currentStats, futureClassesPerSubject, desiredPercentage) {
-  const numberOfSubjects = currentStats.parsedData.length;
-  const totalFutureClasses = futureClassesPerSubject * numberOfSubjects;
+export function calculateAllowedSkips(currentAttendance, totalClasses, desiredPercentage) {
+  const currentAttended = currentAttendance.attendedClasses;
+  const remainingClasses = totalClasses - currentAttendance.totalClasses;
   
-  const currentTotalAttended = currentStats.totalStats.totalAttended;
-  const currentTotalClasses = currentStats.totalStats.totalClasses;
+  // Calculate minimum classes needed to maintain desired percentage
+  const totalRequiredClasses = Math.ceil((desiredPercentage / 100) * totalClasses);
+  const additionalClassesNeeded = Math.max(0, totalRequiredClasses - currentAttended);
   
-  const finalTotalClasses = currentTotalClasses + totalFutureClasses;
-  const requiredTotalClasses = Math.ceil((desiredPercentage / 100) * finalTotalClasses);
-  const additionalClassesNeeded = Math.max(0, requiredTotalClasses - currentTotalAttended);
-  const maxSkippableClasses = totalFutureClasses - additionalClassesNeeded;
+  const allowedSkips = Math.max(0, remainingClasses - additionalClassesNeeded);
   
   return {
-    currentStats: {
-      attended: currentTotalAttended,
-      total: currentTotalClasses,
-      percentage: parseFloat(((currentTotalAttended / currentTotalClasses) * 100).toFixed(2))
-    },
-    futureStats: {
-      totalNewClasses: totalFutureClasses,
-      finalTotalClasses: finalTotalClasses,
-      requiredAttendance: requiredTotalClasses,
-      additionalClassesNeeded: additionalClassesNeeded,
-      allowedSkips: Math.max(0, maxSkippableClasses),
-      projectedFinalPercentage: parseFloat(((requiredTotalClasses / finalTotalClasses) * 100).toFixed(2))
-    }
-  };
-}
-
-// Calculates the required attendance percentage for remaining classes
-export function calculateRequiredPercentageForRemaining(currentStats, futureClassesPerSubject, desiredPercentage) {
-  const { futureStats: future } = calculateRequiredAttendance(
-    currentStats,
-    futureClassesPerSubject,
-    desiredPercentage
-  );
-  
-  const percentageNeeded = (future.additionalClassesNeeded / future.totalNewClasses) * 100;
-  
-  return {
-    percentageNeeded: parseFloat(percentageNeeded.toFixed(2)),
-    classesNeeded: future.additionalClassesNeeded,
-    totalRemainingClasses: future.totalNewClasses
+    allowedSkips,
+    remainingClasses,
+    requiredAttendance: additionalClassesNeeded,
+    totalRequiredClasses,
+    currentAttended,
+    totalClasses
   };
 }
