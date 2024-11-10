@@ -72,7 +72,7 @@ const AttendanceCalculator = () => {
   const AttendanceSummary = ({ summary }) => (
     <div className="space-y-4">
       <h3 className="text-xl font-semibold">Summary</h3>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="p-4 bg-blue-50 rounded-lg">
           <p className="text-sm text-gray-600">Current Attendance</p>
           <p className="text-2xl font-bold">{summary.currentAttendance.toFixed(1)}%</p>
@@ -128,9 +128,9 @@ const AttendanceCalculator = () => {
   );
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Header step={step} />
-      <Card className="my-8">
+      <Card className="my-8 mx-auto max-w-4xl">
         {step === 1 && (
           <UploadAttendanceScreenshot onUpload={handleScreenshotUpload} />
         )}
@@ -172,16 +172,18 @@ const AttendanceCalculator = () => {
 
       {attendanceData && (
         <Modal open={!!attendanceData} onOpenChange={() => setAttendanceData(null)}>
-          <ModalContent className="max-w-2xl">
-            <div className="space-y-6 p-4">
-              <AttendanceSummary summary={attendanceData.summary} />
-              <CourseWiseAnalysis courses={attendanceData.courseWise} />
+          <ModalContent className="fixed inset-4 sm:inset-auto sm:max-w-3xl sm:mx-auto sm:my-16">
+            <div className="flex flex-col h-full max-h-[calc(100vh-8rem)]">
+              <div className="flex-1 overflow-y-auto p-6">
+                <AttendanceSummary summary={attendanceData.summary} />
+                <CourseWiseAnalysis courses={attendanceData.courseWise} />
+              </div>
+              <ModalFooter className="border-t bg-white p-4">
+                <Button variant="secondary" onClick={handleReset}>
+                  Okay
+                </Button>
+              </ModalFooter>
             </div>
-            <ModalFooter>
-              <Button variant="secondary" onClick={handleReset}>
-                Start Over
-              </Button>
-            </ModalFooter>
           </ModalContent>
         </Modal>
       )}
