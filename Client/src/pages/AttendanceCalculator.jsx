@@ -100,18 +100,18 @@ const AttendanceCalculator = () => {
         {courses.map((course, index) => (
           <div
             key={index}
-            className={`p-4 rounded-lg border ${course.canSkip === false
+            className={`p-4 rounded-lg border ${course.recommendation === "Cannot miss lectures"
               ? 'border-red-200 bg-red-50'
-              : course.canSkip === true
+              : course.recommendation === "Safe to miss some classes"
                 ? 'border-green-200 bg-green-50'
                 : 'border-gray-200 bg-gray-50'
               }`}
           >
             <div className="flex justify-between items-center">
               <h4 className="font-semibold">{course.course}</h4>
-              <span className={`px-3 py-1 rounded-full text-sm ${course.canSkip === false
+              <span className={`px-3 py-1 rounded-full text-sm ${course.recommendation === "Cannot miss lectures"
                 ? 'bg-red-100 text-red-800'
-                : course.canSkip === true
+                : course.recommendation === "Safe to miss some classes"
                   ? 'bg-green-100 text-green-800'
                   : 'bg-gray-100 text-gray-800'
                 }`}>
