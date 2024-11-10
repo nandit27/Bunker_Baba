@@ -1,10 +1,9 @@
-// ocr.js
-import Tesseract from 'tesseract.js';
+const Tesseract = require('tesseract.js');
 
-export async function extractAttendanceData(imageBuffer) {
+async function extractAttendanceData(imageBuffer) {
   try {
     const { data } = await Tesseract.recognize(imageBuffer, 'eng');
-    
+
     const ocrResults = {
       fullText: data.text,
       confidence: data.confidence,
@@ -17,9 +16,9 @@ export async function extractAttendanceData(imageBuffer) {
     };
 
     const attendanceData = parseAttendanceData(data.text);
-    
+
     return {
-      ocrResults,
+      ocrResults: ocrResults.paragraphs,
       parsedData: attendanceData
     };
   } catch (error) {
@@ -33,59 +32,144 @@ function parseAttendanceData(text) {
   const coursePattern = /(HS|IT|MA)\d+/;
   const attendancePattern = /(\d+)\s*\/\s*(\d+)/;
   const subjectData = [];
+  let totalClasses = 0;
+  let totalAttendedClasses = 0;
 
   for (const line of lines) {
-      if (coursePattern.test(line)) {
-          let totalAttended = 0;
-          let totalClasses = 0;
-          const attendanceMatch = line.match(attendancePattern);
+    if (coursePattern.test(line)) {
+      const attendanceMatch = line.match(attendancePattern);
 
-          if (attendanceMatch) {
-              const attended = parseInt(attendanceMatch[1]);
-              const total = parseInt(attendanceMatch[2]);
+      if (attendanceMatch) {
+        const attended = parseInt(attendanceMatch[1]);
+        const total = parseInt(attendanceMatch[2]);
 
-              if (!isNaN(attended) && !isNaN(total)) {
-                  const courseMatch = line.match(/((?:HS|IT|MA)\d+(?:\.\d+)?[A-Z\s/-]+)/);
-                  const courseCode = courseMatch ? courseMatch[1].trim() : 'Unknown';
-                  const type = line.includes('LAB') ? 'LAB' : 'LECT';
+        if (!isNaN(attended) && !isNaN(total)) {
+          const courseMatch = line.match(/((?:HS|IT|MA)\d+(?:\.\d+)?[A-Z\s/-]+)/);
+          const courseCode = courseMatch ? courseMatch[1].trim() : 'Unknown';
+          const type = line.includes('LAB') ? 'LAB' : 'LECT';
 
-                  subjectData.push({
-                      courseCode,
-                      type,
-                      attended,
-                      total,
-                      percentage: parseFloat(((attended / total) * 100).toFixed(2))
-                  });
+          subjectData.push({
+            courseCode,
+            type,
+            attended,
+            total,
+            percentage: parseFloat(((attended / total) * 100).toFixed(2))
+          });
 
-                  totalAttended += attended;
-                  totalClasses += total;
-              }
-          }
+          totalClasses += total;
+          totalAttendedClasses += attended;
+        }
       }
+    }
   }
 
-  // Calculate overall attendance percentage
-  const currentPercentage = totalClasses > 0 ? parseFloat(((totalAttended / totalClasses) * 100).toFixed(2)) : 0;
-
-  return { subjectData, totalClasses, totalAttended, currentPercentage };
-}
-
-export function calculateAllowedSkips(currentAttendance, totalClasses, desiredPercentage) {
-  const currentAttended = currentAttendance.attendedClasses;
-  const remainingClasses = totalClasses - currentAttendance.totalClasses;
-  
-  // Calculate minimum classes needed to maintain desired percentage
-  const totalRequiredClasses = Math.ceil((desiredPercentage / 100) * totalClasses);
-  const additionalClassesNeeded = Math.max(0, totalRequiredClasses - currentAttended);
-  
-  const allowedSkips = Math.max(0, remainingClasses - additionalClassesNeeded);
-  
   return {
-    allowedSkips,
-    remainingClasses,
-    requiredAttendance: additionalClassesNeeded,
-    totalRequiredClasses,
-    currentAttended,
-    totalClasses
+    subjects: subjectData,
+    summary: {
+      totalClasses,
+      totalAttendedClasses
+    }
   };
 }
+
+function calculateAllowedSkips(attendance, desiredPercentage = 85, weeksRemaining = 4) {
+  // Weekly schedule for each course (consider externalizing this for easier maintenance)
+  const weeklySchedule = {
+    "HS121.02A/HS-": { lectures: 2, labs: 0 },
+    "IT259 / DSA": { lectures: 3, labs: 1 },
+    "IT260 / DBMS": { lectures: 3, labs: 1 },
+    "IT262 / WT": { lectures: 0, labs: 2 },
+    "IT267 / JP": { lectures: 2, labs: 2 },
+    "MA253 / DMA": { lectures: 4, labs: 0 }
+  };
+
+  // Extract summary for easier access
+  const { totalAttendedClasses: totalAttended, totalClasses } = attendance.summary;
+
+  // Process raw attendance data into a structured format
+  const processedData = attendance.subjects.reduce((acc, entry) => {
+    const courseCode = entry.courseCode.split('/')[0].trim();
+    const classType = entry.type.toUpperCase(); // Normalize to uppercase
+
+    if (!acc[courseCode]) {
+      acc[courseCode] = { LECT: { present: 0, total: 0 }, LAB: { present: 0, total: 0 } };
+    }
+
+    acc[courseCode][classType].present = entry.attended;
+    acc[courseCode][classType].total = entry.total;
+    return acc;
+  }, {});
+
+  // Calculate future classes based on the weekly schedule
+  const futureClasses = Object.values(weeklySchedule).reduce((sum, schedule) =>
+    sum + (schedule.lectures + schedule.labs) * weeksRemaining, 0
+  );
+
+  // Determine required attendance and allowed skips
+  const totalClassesIncludingRemaining = totalClasses + futureClasses;
+  const minimumRequiredAttendance = Math.ceil((desiredPercentage / 100) * totalClassesIncludingRemaining);
+  const additionalClassesNeeded = Math.max(0, minimumRequiredAttendance - totalAttended);
+  const allowedSkipClasses = Math.max(0, futureClasses - additionalClassesNeeded);
+
+  // Generate course-wise recommendations
+  const recommendations = Object.entries(processedData).map(([course, data]) => {
+    const lecturePercentage = data.LECT.total ? (data.LECT.present / data.LECT.total) * 100 : null;
+    const labPercentage = data.LAB.total ? (data.LAB.present / data.LAB.total) * 100 : null;
+
+    const weeklyClasses = weeklySchedule[course] || { lectures: 0, labs: 0 };
+    const futureClassesForCourse = (weeklyClasses.lectures + weeklyClasses.labs) * weeksRemaining;
+
+    return {
+      course,
+      currentAttendance: {
+        lectures: lecturePercentage ? `${lecturePercentage.toFixed(1)}%` : 'N/A',
+        labs: labPercentage ? `${labPercentage.toFixed(1)}%` : 'N/A'
+      },
+      weeklyClasses,
+      canSkip: (lecturePercentage && lecturePercentage > 85) || (labPercentage && labPercentage > 85),
+      futureClasses: futureClassesForCourse,
+      recommendation: getRecommendation(lecturePercentage, labPercentage)
+    };
+  });
+
+  // Helper function to determine attendance recommendation
+  function getRecommendation(lecturePercent, labPercent) {
+    if (lecturePercent === null && labPercent === null) return "No data available";
+    if (lecturePercent > 90 || labPercent > 90) return "Safe to miss some classes";
+    if (lecturePercent < 75) return "Cannot miss lectures";
+    if (labPercent < 75) return "Cannot miss labs";
+    return "Attend if possible";
+  }
+
+  // Compile the final result
+  const result = {
+    summary: {
+      currentAttendance: (totalAttended / totalClasses) * 100,
+      totalClassesRemaining: futureClasses,
+      requiredAttendance: minimumRequiredAttendance,
+      allowedSkips: allowedSkipClasses,
+      additionalClassesNeeded
+    },
+    courseWise: recommendations
+  };
+
+  // Optional console output for visualization (consider removing in production)
+  // console.log("\nAttendance Analysis
+
+  // Console output for better visualization
+  console.log("\nAttendance Analysis Summary:");
+  console.table(result.summary);
+
+  console.log("\nCourse-wise Recommendations:");
+  console.table(result.courseWise.map(r => ({
+    Course: r.course,
+    'Current Lectures': r.currentAttendance.lectures,
+    'Current Labs': r.currentAttendance.labs,
+    'Weekly Classes': `${r.weeklyClasses.lectures} lec, ${r.weeklyClasses.labs} lab`,
+    'Recommendation': r.recommendation
+  })));
+
+  return result;
+}
+
+module.exports = { extractAttendanceData, calculateAllowedSkips };

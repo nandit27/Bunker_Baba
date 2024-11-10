@@ -1,6 +1,6 @@
-import express from 'express';
-import multer from 'multer';
-import { extractAttendanceData, calculateAllowedSkips } from '../utils/ocr.js';
+const express = require('express');
+const multer = require('multer');
+const { extractAttendanceData, calculateAllowedSkips } = require('../utils/ocr.js');
 
 const router = express.Router();
 const upload = multer();
@@ -17,17 +17,20 @@ router.post('/analyze', upload.single('screenshot'), async (req, res) => {
 
         // Extract attendance data using OCR
         const { ocrResults, parsedData } = await extractAttendanceData(imageBuffer);
-
+        // console.log('Parsed data:', parsedData);
+        
         // Calculate remaining classes based on timeFrame
-        const classesPerWeek = 5; // Adjust based on your schedule
+        const classesPerWeek = 20; // Adjust based on your schedule
         const weeksInTimeFrame = parseInt(timeFrame) || 4; // Default to 4 weeks if parsing fails
         const totalRemainingClasses = classesPerWeek * weeksInTimeFrame;
+        // console.log('Total remaining classes:', totalRemainingClasses);
+        
 
         // Calculate allowed skips
         const skipCalculation = calculateAllowedSkips(
             parsedData,
-            parsedData.totalClasses + totalRemainingClasses,
-            desiredAttendance
+            desiredAttendance,
+            parsedData.summary.totalClasses + totalRemainingClasses,
         );
 
         res.json({
@@ -47,4 +50,4 @@ router.post('/analyze', upload.single('screenshot'), async (req, res) => {
     }
 });
 
-export default router;
+module.exports = router;
