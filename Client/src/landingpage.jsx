@@ -29,7 +29,7 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <main className="container mx-auto px-4 pt-16 text-center">
+      <main className="container mx-auto px-4 text-center">
         {/* Character container with floating animation */}
         <div className="relative flex justify-center mb-16">        
           {/* Floating character */}

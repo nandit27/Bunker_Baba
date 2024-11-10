@@ -147,8 +147,9 @@ const AttendanceCalculator = () => {
           />
         )}
         {step < 3 && (
-          <div className="flex justify-end">
+          <div className="flex justify-end mt-4">
             <Button
+              className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-black-800 rounded-lg transition duration-200"
               onClick={() => setStep(step + 1)}
               disabled={step === 1 && !attendanceScreenshot}
             >
@@ -157,10 +158,12 @@ const AttendanceCalculator = () => {
           </div>
         )}
         {step === 3 && (
-          <div className="flex justify-between">
-            <Button onClick={handleReset}>Reset</Button>
+          <div className="flex justify-between mt-4">
             <Button
-              variant="primary"
+            className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-black-800 rounded-lg transition duration-200"
+            onClick={handleReset}>Reset</Button>
+            <Button
+              className="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition duration-200"
               onClick={calculateAllowedSkips}
               disabled={loading}
             >
