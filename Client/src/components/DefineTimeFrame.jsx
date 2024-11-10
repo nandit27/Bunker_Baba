@@ -1,41 +1,60 @@
-import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui';
+import React, { useState } from 'react';
+import { Calendar, Clock, ArrowRight } from 'lucide-react';
 
 const DefineTimeFrame = ({ timeFrame, onTimeFrameChange }) => {
-  const timeFrameOptions = [
-    '1 week',
-    '2 weeks',
-    '1 month',
-    '2 months',
-    '3 months',
-    '6 months'
+  const [selectedAnimation, setSelectedAnimation] = useState('');
+  
+  const timeFrames = [
+    { value: '1 week', icon: '🎯', label: 'Quick Sprint' },
+    { value: '2 weeks', icon: '⚡', label: 'Power Sprint' },
+    { value: '1 month', icon: '📅', label: 'Monthly Goal' },
+    { value: '2 months', icon: '🎓', label: 'Term Goal' },
+    { value: '3 months', icon: '🌟', label: 'Quarter Goal' },
+    { value: '6 months', icon: '🏆', label: 'Semester Goal' }
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Define Time Frame</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="mb-4">Select the time period for your attendance goal.</p>
+    <div className="p-8 bg-white rounded-2xl shadow-lg">
+      <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+        <Clock className="w-6 h-6" />
+        Choose Your Timeline
+      </h2>
+      
+      <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6">
         <div className="grid grid-cols-2 gap-4">
-          {timeFrameOptions.map((option) => (
+          {timeFrames.map((frame) => (
             <button
-              key={option}
-              onClick={() => onTimeFrameChange(option)}
-              className={`p-4 rounded-lg border ${
-                timeFrame === option
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-blue-200'
-              }`}
+              key={frame.value}
+              onClick={() => {
+                setSelectedAnimation(frame.value);
+                setTimeout(() => onTimeFrameChange(frame.value), 300);
+              }}
+              className={`p-6 rounded-xl text-center transition-all duration-300 ${
+                timeFrame === frame.value
+                  ? 'bg-gradient-to-r from-black to-gray-800 text-white shadow-lg scale-105'
+                  : 'bg-white text-gray-900 hover:bg-gray-50'
+              } ${selectedAnimation === frame.value ? 'animate-wiggle' : ''}`}
             >
-              {option}
+              <div className="text-3xl mb-2">{frame.icon}</div>
+              <div className="font-medium">{frame.value}</div>
+              <div className="text-sm mt-1 opacity-75">{frame.label}</div>
             </button>
           ))}
         </div>
-      </CardContent>
-    </Card>
+        
+        {/* Timeline Visualization */}
+        <div className="mt-8 p-4 bg-white rounded-lg border border-gray-200">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-gray-600" />
+            <span className="text-gray-900 font-medium">Your Journey:</span>
+            <span className="text-gray-800">Today</span>
+            <ArrowRight className="w-4 h-4 text-gray-400" />
+            <span className="text-gray-800 font-medium">{timeFrame} later</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default DefineTimeFrame; 
+export default DefineTimeFrame;
