@@ -1,33 +1,21 @@
 import React from 'react';
-import { HelpCircle, BookOpen, Mail } from 'lucide-react';
+import { Card, CardContent, Button } from '@/components/ui';
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-r from-indigo-900 to-violet-900 py-6 mt-auto">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="flex flex-wrap justify-between items-center gap-4">
-          <div className="text-white">
-            <p className="text-lg font-medium">Attendance Tracker</p>
-            <p className="text-sm text-indigo-200">Making attendance management fun! 🎉</p>
-          </div>
-          
-          <div className="flex gap-6">
-            <button className="flex items-center gap-2 text-white hover:text-emerald-400 transition-colors">
-              <HelpCircle className="w-5 h-5" />
-              <span>Help</span>
-            </button>
-            <button className="flex items-center gap-2 text-white hover:text-emerald-400 transition-colors">
-              <BookOpen className="w-5 h-5" />
-              <span>FAQ</span>
-            </button>
-            <button className="flex items-center gap-2 text-white hover:text-emerald-400 transition-colors">
-              <Mail className="w-5 h-5" />
-              <span>Contact</span>
-            </button>
-          </div>
+    <Card className="mt-8">
+      <CardContent className="flex justify-between items-center">
+        <Button variant="secondary" href="/">
+          Back to Landing
+        </Button>
+        <div>
+          <a href="/help" className="mr-4">
+            Help
+          </a>
+          <a href="/faq">FAQ</a>
         </div>
-      </div>
-    </footer>
+      </CardContent>
+    </Card>
   );
 };
 
