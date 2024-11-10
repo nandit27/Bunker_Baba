@@ -1,4 +1,5 @@
 import React from 'react';
+import card from './assets/card1.jpeg';
 import { Button } from "@/components/ui/button";
 
 const SecondSection = () => {
@@ -17,6 +18,11 @@ const SecondSection = () => {
                 <div className="w-3 h-3 rounded-full bg-gray-300"></div>
                 <div className="w-3 h-3 rounded-full bg-gray-300"></div>
               </div>
+              <img 
+                src={card}
+                alt="Description"
+                className="w-full h-full object-cover absolute inset-0 z-10"
+              />
             </div>
           </div>
         </div>

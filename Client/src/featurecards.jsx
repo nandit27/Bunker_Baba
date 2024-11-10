@@ -1,10 +1,32 @@
 import React from 'react';
+import insight from './assets/bulb.png';
+import ocr from './assets/ocr.png';
+import plan from './assets/plan.png';
 import { Button } from "@/components/ui/button";
+
+const getImage = (title) => {
+  switch (title) {
+    case "Attendance Insights":
+      return insight;
+    case "OCR-Powered Tracking":
+      return ocr;
+    case "Lecture Bunk Plan":
+      return plan;
+    default:
+      return "";
+  }
+};
 
 const FeatureCard = ({ title, description, buttonText}) => {
   return (
     <div className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-      <div className="w-full h-48 bg-[repeating-linear-gradient(45deg,#f0f0f0,#f0f0f0 10px,#f5f5f5 10px,#f5f5f5 20px)] rounded-lg mb-6"></div>
+      <div className="w-full h-48 rounded-lg mb-6">
+        <img 
+          src={getImage(title)}  
+          alt={title}
+          className="w-full h-full object-contain rounded-lg"  
+        />
+      </div>
       <h3 className="text-xl font-semibold mb-3">{title}</h3>
       <p className="text-gray-600 mb-4">{description}</p>
       <Button variant="outline" className="w-full justify-center">

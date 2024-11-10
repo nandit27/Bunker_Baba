@@ -21,17 +21,17 @@ const LandingPage = () => {
         </div>
         
         <div className="flex items-center gap-6">
-          <button className="text-gray-600 hover:text-gray-900">Product</button>
-          <button className="text-gray-600 hover:text-gray-900">Login</button>
-          <button className="text-gray-600 hover:text-gray-900">Sign Up</button>
-          <button className="text-gray-600 hover:text-gray-900">Pricing</button>
+          <button className="text-gray-600 hover:text-gray-900">Home</button>
+          <button className="text-gray-600 hover:text-gray-900">Dashboard</button>
+          <button className="text-gray-600 hover:text-gray-900">About</button>
+          <button className="text-gray-600 hover:text-gray-900">User</button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <main className="container mx-auto px-4 pt-16 text-center">
+      <main className="container mx-auto px-4 text-center">
         {/* Character container with floating animation */}
-        <div className="relative flex justify-center mb-16">        
+        <div className="relative flex justify-center mb-8">        
           {/* Floating character */}
           <img 
             src={baba}
@@ -55,7 +55,7 @@ const LandingPage = () => {
             className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-base"
             onClick={() => navigate('/calculator')}
           >
-            Shuru Karo !
+            Try Now !
           </Button>
           <Button 
             variant="outline"
