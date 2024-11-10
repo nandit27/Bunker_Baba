@@ -3,6 +3,7 @@ const Tesseract = require('tesseract.js');
 async function extractAttendanceData(imageBuffer) {
   try {
     const { data } = await Tesseract.recognize(imageBuffer, 'eng');
+    console.log('Extracted Data:', data);
 
     const ocrResults = {
       fullText: data.text,
@@ -15,7 +16,10 @@ async function extractAttendanceData(imageBuffer) {
       paragraphs: data.paragraphs?.map(p => p.text)
     };
 
+    console.log('OCR Results:', ocrResults);
+
     const attendanceData = parseAttendanceData(data.text);
+    console.log('Parsed Attendance Data:', attendanceData);
 
     return {
       ocrResults: ocrResults.paragraphs,
@@ -28,6 +32,8 @@ async function extractAttendanceData(imageBuffer) {
 }
 
 function parseAttendanceData(text) {
+  console.log('Parsing Attendance Data:', text);
+
   const lines = text.split('\n').filter(line => line.trim());
   const coursePattern = /(HS|IT|MA)\d+/;
   const attendancePattern = /(\d+)\s*\/\s*(\d+)/;
@@ -72,8 +78,9 @@ function parseAttendanceData(text) {
   };
 }
 
-function calculateAllowedSkips(attendance, desiredPercentage = 85, weeksRemaining = 4) {
-  // Weekly schedule for each course (consider externalizing this for easier maintenance)
+function calculateAllowedSkips(attendance, desiredPercentage, weeksRemaining) {
+  console.log('Calculating Allowed Skips:', attendance);
+  // Weekly schedule for each course
   const weeklySchedule = {
     "HS121.02A/HS-": { lectures: 2, labs: 0 },
     "IT259 / DSA": { lectures: 3, labs: 1 },
@@ -89,7 +96,7 @@ function calculateAllowedSkips(attendance, desiredPercentage = 85, weeksRemainin
   // Process raw attendance data into a structured format
   const processedData = attendance.subjects.reduce((acc, entry) => {
     const courseCode = entry.courseCode.split('/')[0].trim();
-    const classType = entry.type.toUpperCase(); // Normalize to uppercase
+    const classType = entry.type.toUpperCase();
 
     if (!acc[courseCode]) {
       acc[courseCode] = { LECT: { present: 0, total: 0 }, LAB: { present: 0, total: 0 } };
@@ -101,22 +108,29 @@ function calculateAllowedSkips(attendance, desiredPercentage = 85, weeksRemainin
   }, {});
 
   // Calculate future classes based on the weekly schedule
-  const futureClasses = Object.values(weeklySchedule).reduce((sum, schedule) =>
-    sum + (schedule.lectures + schedule.labs) * weeksRemaining, 0
-  );
+  const futureClasses = Math.floor(Object.entries(weeklySchedule).reduce((sum, [course, schedule]) => {
+    const matchingCourse = Object.keys(weeklySchedule).find(key => key.includes(course.split('/')[0]));
+    if (matchingCourse) {
+      return sum + (schedule.lectures + schedule.labs);
+    }
+    return sum;
+  }, 0) * weeksRemaining);
 
-  // Determine required attendance and allowed skips
+  // Calculate current and target metrics
+  const currentPercentage = (totalAttended / totalClasses) * 100;
   const totalClassesIncludingRemaining = totalClasses + futureClasses;
   const minimumRequiredAttendance = Math.ceil((desiredPercentage / 100) * totalClassesIncludingRemaining);
   const additionalClassesNeeded = Math.max(0, minimumRequiredAttendance - totalAttended);
-  const allowedSkipClasses = Math.max(0, futureClasses - additionalClassesNeeded);
+  const allowedSkips = Math.max(0, futureClasses - additionalClassesNeeded);
 
   // Generate course-wise recommendations
   const recommendations = Object.entries(processedData).map(([course, data]) => {
     const lecturePercentage = data.LECT.total ? (data.LECT.present / data.LECT.total) * 100 : null;
     const labPercentage = data.LAB.total ? (data.LAB.present / data.LAB.total) * 100 : null;
 
-    const weeklyClasses = weeklySchedule[course] || { lectures: 0, labs: 0 };
+    // Find matching course in weekly schedule
+    const courseKey = Object.keys(weeklySchedule).find(key => key.includes(course));
+    const weeklyClasses = weeklySchedule[courseKey] || { lectures: 0, labs: 0 };
     const futureClassesForCourse = (weeklyClasses.lectures + weeklyClasses.labs) * weeksRemaining;
 
     return {
@@ -127,36 +141,29 @@ function calculateAllowedSkips(attendance, desiredPercentage = 85, weeksRemainin
       },
       weeklyClasses,
       canSkip: (lecturePercentage && lecturePercentage > 85) || (labPercentage && labPercentage > 85),
-      futureClasses: futureClassesForCourse,
+      futureClasses: Math.floor(futureClassesForCourse),
       recommendation: getRecommendation(lecturePercentage, labPercentage)
     };
   });
 
-  // Helper function to determine attendance recommendation
   function getRecommendation(lecturePercent, labPercent) {
     if (lecturePercent === null && labPercent === null) return "No data available";
+    if ((lecturePercent && lecturePercent < 75) || (labPercent && labPercent < 75)) return "Cannot miss lectures";
     if (lecturePercent > 90 || labPercent > 90) return "Safe to miss some classes";
-    if (lecturePercent < 75) return "Cannot miss lectures";
-    if (labPercent < 75) return "Cannot miss labs";
     return "Attend if possible";
   }
 
-  // Compile the final result
   const result = {
     summary: {
-      currentAttendance: (totalAttended / totalClasses) * 100,
+      currentAttendance: parseFloat(currentPercentage.toFixed(2)),
       totalClassesRemaining: futureClasses,
       requiredAttendance: minimumRequiredAttendance,
-      allowedSkips: allowedSkipClasses,
+      allowedSkips: allowedSkips,
       additionalClassesNeeded
     },
     courseWise: recommendations
   };
 
-  // Optional console output for visualization (consider removing in production)
-  // console.log("\nAttendance Analysis
-
-  // Console output for better visualization
   console.log("\nAttendance Analysis Summary:");
   console.table(result.summary);
 
@@ -172,4 +179,9 @@ function calculateAllowedSkips(attendance, desiredPercentage = 85, weeksRemainin
   return result;
 }
 
-module.exports = { extractAttendanceData, calculateAllowedSkips };
+// Make sure to export all required functions
+module.exports = {
+  extractAttendanceData,
+  calculateAllowedSkips,
+  parseAttendanceData
+};

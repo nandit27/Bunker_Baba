@@ -3,7 +3,7 @@ const multer = require('multer');
 const { extractAttendanceData, calculateAllowedSkips } = require('../utils/ocr.js');
 
 const router = express.Router();
-const upload = multer();
+const upload = multer();;
 
 router.post('/analyze', upload.single('screenshot'), async (req, res) => {
     try {
@@ -12,36 +12,28 @@ router.post('/analyze', upload.single('screenshot'), async (req, res) => {
         }
 
         const imageBuffer = req.file.buffer;
-        const desiredAttendance = parseFloat(req.body.desiredAttendance);
-        const timeFrame = req.body.timeFrame;
+        const desiredAttendance = parseFloat(req.body.desiredAttendance) || 75; // Default to 75%
+        const weeksRemaining = parseInt(req.body.timeFrame) || 4; // Default to 4 weeks
 
         // Extract attendance data using OCR
         const { ocrResults, parsedData } = await extractAttendanceData(imageBuffer);
-        // console.log('Parsed data:', parsedData);
         
-        // Calculate remaining classes based on timeFrame
-        const classesPerWeek = 20; // Adjust based on your schedule
-        const weeksInTimeFrame = parseInt(timeFrame) || 4; // Default to 4 weeks if parsing fails
-        const totalRemainingClasses = classesPerWeek * weeksInTimeFrame;
-        // console.log('Total remaining classes:', totalRemainingClasses);
-        
-
-        // Calculate allowed skips
+        // Calculate allowed skips - just pass weeks remaining
         const skipCalculation = calculateAllowedSkips(
             parsedData,
             desiredAttendance,
-            parsedData.summary.totalClasses + totalRemainingClasses,
+            weeksRemaining  // Just pass the number of weeks
         );
 
         res.json({
-            allowedSkips: skipCalculation.allowedSkips,
+            summary: skipCalculation.summary,
+            courseWise: skipCalculation.courseWise,
             attendanceData: parsedData,
             ocrResults: ocrResults,
             debug: {
-                timeFrame,
+                weeksRemaining,
                 desiredAttendance,
-                totalRemainingClasses,
-                currentAttendance: parsedData.currentPercentage
+                currentAttendance: skipCalculation.summary.currentAttendance
             }
         });
     } catch (error) {
