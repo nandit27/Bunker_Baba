@@ -1,7 +1,7 @@
-import express from 'express';
-import attendanceRoutes from './routes/attendance.js';
-import cors from 'cors';
-import multer from 'multer';
+const express = require('express');
+const attendanceRoutes = require('./routes/attendance');
+const cors = require('cors');
+const multer = require('multer');
 
 const app = express();
 const port = 3000;
