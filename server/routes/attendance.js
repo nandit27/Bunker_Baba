@@ -16,20 +16,29 @@ router.post('/analyze', upload.single('screenshot'), async (req, res) => {
         const weeksRemaining = parseInt(req.body.timeFrame) || 4; // Default to 4 weeks
 
         // Extract attendance data using OCR
-        const { ocrResults, parsedData } = await extractAttendanceData(imageBuffer);
-        
+        const { parsedData } = await extractAttendanceData(imageBuffer);
+
         // Calculate allowed skips - just pass weeks remaining
         const skipCalculation = calculateAllowedSkips(
             parsedData,
             desiredAttendance,
             weeksRemaining  // Just pass the number of weeks
         );
-
+        // console.log({
+        //     summary: skipCalculation.summary,
+        //     courseWise: skipCalculation.courseWise,
+        //     attendanceData: parsedData,
+        //     // ocrResults: ocrResults,
+        //     debug: {
+        //         weeksRemaining,
+        //         desiredAttendance,
+        //         currentAttendance: skipCalculation.summary.currentAttendance
+        //     }
+        // })
         res.json({
             summary: skipCalculation.summary,
             courseWise: skipCalculation.courseWise,
             attendanceData: parsedData,
-            ocrResults: ocrResults,
             debug: {
                 weeksRemaining,
                 desiredAttendance,

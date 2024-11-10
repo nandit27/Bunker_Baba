@@ -3,7 +3,7 @@ const Tesseract = require('tesseract.js');
 async function extractAttendanceData(imageBuffer) {
   try {
     const { data } = await Tesseract.recognize(imageBuffer, 'eng');
-    console.log('Extracted Data:', data);
+    // console.log('Extracted Data:', data);
 
     const ocrResults = {
       fullText: data.text,
@@ -16,10 +16,10 @@ async function extractAttendanceData(imageBuffer) {
       paragraphs: data.paragraphs?.map(p => p.text)
     };
 
-    console.log('OCR Results:', ocrResults);
+    // console.log('OCR Results:', ocrResults);
 
     const attendanceData = parseAttendanceData(data.text);
-    console.log('Parsed Attendance Data:', attendanceData);
+    // console.log('Parsed Attendance Data:', attendanceData);
 
     return {
       ocrResults: ocrResults.paragraphs,
@@ -32,7 +32,7 @@ async function extractAttendanceData(imageBuffer) {
 }
 
 function parseAttendanceData(text) {
-  console.log('Parsing Attendance Data:', text);
+  // console.log('Parsing Attendance Data:', text);
 
   const lines = text.split('\n').filter(line => line.trim());
   const coursePattern = /(HS|IT|MA)\d+/;
@@ -79,7 +79,7 @@ function parseAttendanceData(text) {
 }
 
 function calculateAllowedSkips(attendance, desiredPercentage, weeksRemaining) {
-  console.log('Calculating Allowed Skips:', attendance);
+  // console.log('Calculating Allowed Skips:', attendance);
   // Weekly schedule for each course
   const weeklySchedule = {
     "HS121.02A/HS-": { lectures: 2, labs: 0 },
@@ -164,17 +164,17 @@ function calculateAllowedSkips(attendance, desiredPercentage, weeksRemaining) {
     courseWise: recommendations
   };
 
-  console.log("\nAttendance Analysis Summary:");
-  console.table(result.summary);
+  // console.log("\nAttendance Analysis Summary:");
+  // console.table(result.summary);
 
-  console.log("\nCourse-wise Recommendations:");
-  console.table(result.courseWise.map(r => ({
-    Course: r.course,
-    'Current Lectures': r.currentAttendance.lectures,
-    'Current Labs': r.currentAttendance.labs,
-    'Weekly Classes': `${r.weeklyClasses.lectures} lec, ${r.weeklyClasses.labs} lab`,
-    'Recommendation': r.recommendation
-  })));
+  // console.log("\nCourse-wise Recommendations:");
+  // console.table(result.courseWise.map(r => ({
+  //   Course: r.course,
+  //   'Current Lectures': r.currentAttendance.lectures,
+  //   'Current Labs': r.currentAttendance.labs,
+  //   'Weekly Classes': `${r.weeklyClasses.lectures} lec, ${r.weeklyClasses.labs} lab`,
+  //   'Recommendation': r.recommendation
+  // })));
 
   return result;
 }

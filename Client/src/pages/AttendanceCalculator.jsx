@@ -18,8 +18,7 @@ const AttendanceCalculator = () => {
   const [attendanceScreenshot, setAttendanceScreenshot] = useState(null);
   const [desiredAttendance, setDesiredAttendance] = useState(90);
   const [timeFrame, setTimeFrame] = useState('1 month');
-  const [allowedSkips, setAllowedSkips] = useState(0);
-  const [showResults, setShowResults] = useState(false);
+  const [attendanceData, setAttendanceData] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleScreenshotUpload = (file) => {
@@ -43,24 +42,22 @@ const AttendanceCalculator = () => {
     formData.append('timeFrame', timeFrame);
 
     try {
-        const response = await fetch('/api/attendance/analyze', {
-            method: 'POST',
-            body: formData,
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('OCR Results:', data);
-        setAllowedSkips(data.allowedSkips);
-        setShowResults(true);
+      const response = await fetch('/api/attendance/analyze', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setAttendanceData(data);
     } catch (error) {
-        console.error('Error:', error);
-        // Add error handling here
+      console.error('Error:', error);
+      // Add error handling here
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -69,9 +66,66 @@ const AttendanceCalculator = () => {
     setAttendanceScreenshot(null);
     setDesiredAttendance(90);
     setTimeFrame('1 month');
-    setAllowedSkips(0);
-    setShowResults(false);
+    setAttendanceData(null);
   };
+
+  const AttendanceSummary = ({ summary }) => (
+    <div className="space-y-4">
+      <h3 className="text-xl font-semibold">Summary</h3>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="p-4 bg-blue-50 rounded-lg">
+          <p className="text-sm text-gray-600">Current Attendance</p>
+          <p className="text-2xl font-bold">{summary.currentAttendance.toFixed(1)}%</p>
+        </div>
+        <div className="p-4 bg-blue-50 rounded-lg">
+          <p className="text-sm text-gray-600">Classes Remaining</p>
+          <p className="text-2xl font-bold">{summary.totalClassesRemaining}</p>
+        </div>
+        <div className="p-4 bg-blue-50 rounded-lg">
+          <p className="text-sm text-gray-600">Additional Classes Needed</p>
+          <p className="text-2xl font-bold">{summary.additionalClassesNeeded}</p>
+        </div>
+        <div className="p-4 bg-blue-50 rounded-lg">
+          <p className="text-sm text-gray-600">Allowed Skips</p>
+          <p className="text-2xl font-bold">{summary.allowedSkips}</p>
+        </div>
+      </div>
+    </div>
+  );
+
+  const CourseWiseAnalysis = ({ courses }) => (
+    <div className="mt-8">
+      <h3 className="text-xl font-semibold mb-4">Course-wise Analysis</h3>
+      <div className="space-y-4">
+        {courses.map((course, index) => (
+          <div
+            key={index}
+            className={`p-4 rounded-lg border ${course.canSkip === false
+              ? 'border-red-200 bg-red-50'
+              : course.canSkip === true
+                ? 'border-green-200 bg-green-50'
+                : 'border-gray-200 bg-gray-50'
+              }`}
+          >
+            <div className="flex justify-between items-center">
+              <h4 className="font-semibold">{course.course}</h4>
+              <span className={`px-3 py-1 rounded-full text-sm ${course.canSkip === false
+                ? 'bg-red-100 text-red-800'
+                : course.canSkip === true
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-gray-100 text-gray-800'
+                }`}>
+                {course.recommendation}
+              </span>
+            </div>
+            <div className="mt-2 text-sm text-gray-600">
+              <p>Future Classes: {course.futureClasses}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div>
@@ -115,12 +169,14 @@ const AttendanceCalculator = () => {
           </div>
         )}
       </Card>
-      {showResults && (
-        <Modal open={showResults} onOpenChange={setShowResults}>
-          <ModalContent>
-            <h2 className="text-2xl font-bold mb-4">
-              You can miss {allowedSkips} classes to maintain your attendance at {desiredAttendance}% over the next {timeFrame}.
-            </h2>
+
+      {attendanceData && (
+        <Modal open={!!attendanceData} onOpenChange={() => setAttendanceData(null)}>
+          <ModalContent className="max-w-2xl">
+            <div className="space-y-6 p-4">
+              <AttendanceSummary summary={attendanceData.summary} />
+              <CourseWiseAnalysis courses={attendanceData.courseWise} />
+            </div>
             <ModalFooter>
               <Button variant="secondary" onClick={handleReset}>
                 Start Over
