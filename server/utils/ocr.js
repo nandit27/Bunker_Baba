@@ -63,8 +63,6 @@ function parseAttendanceData(text) {
     }
   }
 
-  // console.log(subjectData, totalClasses, totalAttendedClasses);
-
   return {
     subjects: subjectData,
     summary: {
@@ -79,18 +77,12 @@ function parseAttendanceData(text) {
 
 function calculateAllowedSkips(attendanceData, desiredPercentage = 75, totalRemainingClasses = 0) {
   // Input validation
-
-  // console.log("attendanceData", attendanceData);
-  console.log("desiredPercentage", desiredPercentage);
-  console.log("totalRemainingClasses", totalRemainingClasses);
-
   if (!attendanceData?.summary?.totalClasses || !attendanceData?.summary?.totalAttendedClasses) {
     throw new Error('Invalid attendance data');
   }
   if (desiredPercentage <= 0 || desiredPercentage > 100) {
     throw new Error('Desired percentage must be between 0 and 100');
   }
-
   if (totalRemainingClasses < 0) {
     throw new Error('Remaining classes cannot be negative');
   }
@@ -99,20 +91,18 @@ function calculateAllowedSkips(attendanceData, desiredPercentage = 75, totalRema
   const totalAttended = attendanceData.summary.totalAttendedClasses;
   const totalClassesIncludingRemaining = totalClasses + totalRemainingClasses;
 
-  // Calculate current attendance percentage
-  const currentPercentage = (totalAttended / totalClasses) * 100;
-
-  // Calculate minimum classes needed to maintain desired percentage
+  // Calculate the minimum number of classes required to maintain the desired percentage
   const minimumRequiredAttendance = Math.ceil((desiredPercentage / 100) * totalClassesIncludingRemaining);
 
-  // Calculate how many more classes need to be attended
+  // Calculate how many more classes need to be attended to meet the minimum requirement
   const additionalClassesNeeded = Math.max(0, minimumRequiredAttendance - totalAttended);
 
-  // Calculate allowed skips from remaining classes
+  // Calculate the allowed number of skips
   const allowedSkipClasses = Math.max(0, totalRemainingClasses - additionalClassesNeeded);
 
-  // Calculate final percentage if maximum skips are taken
+  // Calculate the final percentage if maximum skips are taken
   const finalPercentage = ((totalAttended + (totalRemainingClasses - allowedSkipClasses)) / totalClassesIncludingRemaining) * 100;
+
   console.table({
     allowedSkips: allowedSkipClasses,
     remainingClasses: totalRemainingClasses,
@@ -121,10 +111,11 @@ function calculateAllowedSkips(attendanceData, desiredPercentage = 75, totalRema
     currentAttended: totalAttended,
     totalClasses,
     totalClassesIncludingRemaining,
-    currentPercentage,
+    currentPercentage: (totalAttended / totalClasses) * 100,
     finalPercentage,
     targetPercentage: desiredPercentage
-  })
+  });
+
   return {
     allowedSkips: allowedSkipClasses,
     remainingClasses: totalRemainingClasses,
@@ -133,9 +124,10 @@ function calculateAllowedSkips(attendanceData, desiredPercentage = 75, totalRema
     currentAttended: totalAttended,
     totalClasses,
     totalClassesIncludingRemaining,
-    currentPercentage,
+    currentPercentage: (totalAttended / totalClasses) * 100,
     finalPercentage,
     targetPercentage: desiredPercentage
   };
 }
+
 module.exports = { extractAttendanceData, calculateAllowedSkips };
