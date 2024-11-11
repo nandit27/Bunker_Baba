@@ -8,21 +8,25 @@ const SecondSection = () => {
     <div className="relative w-full py-32"> {/* Increased vertical padding */}
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 px-4"> {/* Increased gap between grid items */}
         {/* Left side - Enhanced placeholder area */}
-        <div className="relative group">
+        <div className="relative group inline-block">
           <div className="absolute inset-0 bg-gradient-to-tr from-blue-100/50 to-purple-100/50 rounded-2xl transform rotate-2 group-hover:rotate-1 transition-transform"></div>
           <div className="relative bg-white rounded-xl shadow-lg overflow-hidden transform -rotate-1 group-hover:rotate-0 transition-transform">
-            <div className="w-full h-[500px] bg-[repeating-linear-gradient(45deg,#f0f0f0,#f0f0f0 10px,#f5f5f5 10px,#f5f5f5 20px)]">
-              {/* Decorative elements */}
-              <div className="absolute top-4 left-4 flex gap-2">
+            <div className="relative p-4">
+              {/* Decorative dots */}
+              <div className="absolute top-4 left-4 flex gap-2 z-20">
                 <div className="w-3 h-3 rounded-full bg-gray-300"></div>
                 <div className="w-3 h-3 rounded-full bg-gray-300"></div>
                 <div className="w-3 h-3 rounded-full bg-gray-300"></div>
               </div>
-              <img 
-                src={card}
-                alt="Description"
-                className="w-full h-full object-cover absolute inset-0 z-10"
-              />
+              
+              {/* Image container */}
+              <div className="pt-8"> 
+                <img 
+                  src={card}
+                  alt="Card content"
+                  className="w-full h-auto object-contain"
+                />
+              </div>
             </div>
           </div>
         </div>
