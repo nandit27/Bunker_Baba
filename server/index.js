@@ -4,10 +4,14 @@ const cors = require('cors');
 const multer = require('multer');
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 // Global middleware
-app.use(cors());
+app.use(cors(
+  {
+    origin: '*'
+  }
+));
 app.use(express.json());
 
 // Remove multer from here since it's already in the route
@@ -24,5 +28,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
