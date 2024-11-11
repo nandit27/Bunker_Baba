@@ -9,8 +9,10 @@ const port = 3001 || process.env.PORT;
 
 
 app.use(cors({
-  origin: [process.env.FRONTEND_URL, 'http://localhost:5173'],
-  credentials: true
+  origin: `https://bunker-baba-client.vercel.app`,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
