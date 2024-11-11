@@ -2,7 +2,7 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const SelectDepartment = ({ department, onDepartmentChange}) => {
+const SelectDepartment = ({ department, onDepartmentChange }) => {
   const departments = [
     { id: 'IT', name: 'Information Technology' },
     { id: 'CSE', name: 'Computer Science Engineering' },
@@ -23,17 +23,17 @@ const SelectDepartment = ({ department, onDepartmentChange}) => {
   // }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6 p-6 ">
       <h2 className="text-2xl font-bold text-center mb-8">Select Your Department</h2>
       
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="department">Department</Label>
-          <Select value={department} onValueChange={onDepartmentChange}>
-            <SelectTrigger className="w-full">
+          <Select value={department} onValueChange={onDepartmentChange} className="w-full h-12">
+            <SelectTrigger className="w-full h-full border rounded-md ">
               <SelectValue placeholder="Select your department" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white opacity-100">
               {departments.map((dept) => (
                 <SelectItem key={dept.id} value={dept.id}>
                   {dept.name}

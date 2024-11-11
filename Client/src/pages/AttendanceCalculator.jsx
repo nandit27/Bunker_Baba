@@ -138,7 +138,7 @@ const AttendanceCalculator = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header step={step} />
-      <Card className="my-8 mx-auto max-w-4xl">
+      <Card className="my-8 mx-auto max-w-4xl flex-grow">
         {step === 1 && (
           <SelectDepartment 
             department={department}
@@ -174,8 +174,11 @@ const AttendanceCalculator = () => {
         {step === 4 && (
           <div className="flex justify-between mt-4">
             <Button
-            className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-black-800 rounded-lg transition duration-200"
-            onClick={handleReset}>Reset</Button>
+              className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-black-800 rounded-lg transition duration-200"
+              onClick={handleReset}
+            >
+              Reset
+            </Button>
             <Button
               className="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition duration-200"
               onClick={calculateAllowedSkips}
@@ -186,7 +189,7 @@ const AttendanceCalculator = () => {
           </div>
         )}
       </Card>
-
+  
       {attendanceData && (
         <Modal open={!!attendanceData} onOpenChange={() => setAttendanceData(null)}>
           <ModalContent className="fixed inset-4 sm:inset-auto sm:max-w-3xl sm:mx-auto sm:my-16">
@@ -204,7 +207,7 @@ const AttendanceCalculator = () => {
           </ModalContent>
         </Modal>
       )}
-      <Footer />
+      <Footer className="absolute inset-x-0 bottom-0" />
     </div>
   );
 };
