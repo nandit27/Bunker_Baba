@@ -49,7 +49,7 @@ const AttendanceCalculator = () => {
     formData.append('timeFrame', timeFrame);
 
     try {
-      const response = await fetch('/api/attendance/analyze', {
+      const response = await fetch(`${process.env.BACKEND_URL}/api/attendance/analyze`, {
         method: 'POST',
         body: formData,
       });
