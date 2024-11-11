@@ -9,7 +9,7 @@ const port = 3001 || process.env.PORT;
 
 
 app.use(cors({
-  origin: `https://bunker-baba-client.vercel.app`,
+  origin: '*',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'], 
   allowedHeaders: ['Content-Type', 'Authorization']
