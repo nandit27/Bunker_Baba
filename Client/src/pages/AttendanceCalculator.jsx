@@ -49,7 +49,7 @@ const AttendanceCalculator = () => {
     formData.append('timeFrame', timeFrame);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/attendance/analyze`, {
+      const response = await fetch(process.env.REACT_APP_API_ENDPOINT, {
         method: 'POST',
         body: formData,
       });
