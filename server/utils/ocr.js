@@ -78,17 +78,50 @@ function parseAttendanceData(text) {
   };
 }
 
-function calculateAllowedSkips(attendance, desiredPercentage, weeksRemaining) {
+function calculateAllowedSkips(department, attendance, desiredPercentage, weeksRemaining) {
   // console.log('Calculating Allowed Skips:', attendance);
   // Weekly schedule for each course
-  const weeklySchedule = {
-    "HS121.02A/HS-": { lectures: 2, labs: 0 },
-    "IT259 / DSA": { lectures: 3, labs: 1 },
-    "IT260 / DBMS": { lectures: 3, labs: 1 },
-    "IT262 / WT": { lectures: 0, labs: 2 },
-    "IT267 / JP": { lectures: 2, labs: 2 },
-    "MA253 / DMA": { lectures: 4, labs: 0 }
-  };
+  let weeklySchedule;
+  if (department === 'IT') {
+    weeklySchedule = {
+      "HS121.02A/HS-3": { lectures: 2, labs: 0 },
+      "IT259 / DSA": { lectures: 3, labs: 1 },
+      "IT260 / DBMS": { lectures: 3, labs: 1 },
+      "IT262 / WT": { lectures: 0, labs: 2 },
+      "IT267 / JP": { lectures: 2, labs: 2 },
+      "MA253 / DMA": { lectures: 4, labs: 0 }
+    };
+  } else if (department === 'CSE') {
+    weeklySchedule = {
+      "HS121.02A/HS-3": { lectures: 2, labs: 0 },
+      "CSE203 / DSA": { lectures: 4, labs: 2 },
+      "CSE202 / MCO": { lectures: 3, labs: 1 },
+      "CSE204 / PR -": { lectures: 0, labs: 1 },
+      "CSE201 / JP": { lectures: 2, labs: 2 },
+      "MA253 / DMA": { lectures: 4, labs: 0 }
+    };
+  // } else if (department === 'CE') {
+  //   weeklySchedule = {
+  //     "HS121.02A/HS-3": { lectures: 2, labs: 0 },
+  //     "CE261 / DSA": { lectures: 3, labs: 1 },
+  //     "CE271 / COA": { lectures: 3, labs: 1 },
+  //     "CE270 / PROJECT-I": { lectures: 0, labs: 2 },
+  //     "CE251 / JP": { lectures: 2, labs: 2 },
+  //     "MA253 / DMA": { lectures: 4, labs: 0 }
+  //   };
+  } else if (department === 'ECE') {
+    weeklySchedule = {
+      "HS121.02A/HS-3": { lectures: 2, labs: 0 },
+      "EC253 / EDM": { lectures: 4, labs: 1 },
+      "EC260 / DDC": { lectures: 4, labs: 1 },
+      "EC261 / CT": { lectures: 2, labs: 1 },
+      "EC264 / CS": { lectures: 3, labs: 1 },
+      "EC281.01 / IMP": { lectures: 2, labs: 0 },
+      "MA252 / ": { lectures: 4, labs: 0 }
+    };    
+  } else {
+    throw new Error(`Invalid department: ${department}`);
+  }
 
   // Extract summary for easier access
   const { totalAttendedClasses: totalAttended, totalClasses } = attendance.summary;

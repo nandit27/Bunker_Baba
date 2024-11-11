@@ -11,6 +11,7 @@ router.post('/analyze', upload.single('screenshot'), async (req, res) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
+        const department = req.body.department;
         const imageBuffer = req.file.buffer;
         const desiredAttendance = parseFloat(req.body.desiredAttendance) || 75; // Default to 75%
         const weeksRemaining = parseInt(req.body.timeFrame) || 4; // Default to 4 weeks
@@ -20,6 +21,7 @@ router.post('/analyze', upload.single('screenshot'), async (req, res) => {
 
         // Calculate allowed skips - just pass weeks remaining
         const skipCalculation = calculateAllowedSkips(
+            department,
             parsedData,
             desiredAttendance,
             weeksRemaining  // Just pass the number of weeks

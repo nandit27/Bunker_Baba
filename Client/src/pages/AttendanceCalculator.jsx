@@ -12,14 +12,20 @@ import Footer from '../components/Footer';
 import UploadAttendanceScreenshot from '../components/UploadAttendanceScreenshot';
 import SetAttendanceGoal from '../components/SetAttendanceGoal';
 import DefineTimeFrame from '../components/DefineTimeFrame';
+import SelectDepartment from '../components/SelectDepartment';
 
 const AttendanceCalculator = () => {
   const [step, setStep] = useState(1);
+  const [department, setDepartment] = useState('IT');
   const [attendanceScreenshot, setAttendanceScreenshot] = useState(null);
   const [desiredAttendance, setDesiredAttendance] = useState(90);
   const [timeFrame, setTimeFrame] = useState('1 month');
   const [attendanceData, setAttendanceData] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const handleDepartmentChange = (value) => {
+    setDepartment(value);
+  };
 
   const handleScreenshotUpload = (file) => {
     setAttendanceScreenshot(file);
@@ -37,6 +43,7 @@ const AttendanceCalculator = () => {
   const calculateAllowedSkips = async () => {
     setLoading(true);
     const formData = new FormData();
+    formData.append('department', department);
     formData.append('screenshot', attendanceScreenshot);
     formData.append('desiredAttendance', desiredAttendance.toString());
     formData.append('timeFrame', timeFrame);
@@ -63,6 +70,7 @@ const AttendanceCalculator = () => {
 
   const handleReset = () => {
     setStep(1);
+    setDepartment('IT');
     setAttendanceScreenshot(null);
     setDesiredAttendance(90);
     setTimeFrame('1 month');
@@ -132,32 +140,38 @@ const AttendanceCalculator = () => {
       <Header step={step} />
       <Card className="my-8 mx-auto max-w-4xl">
         {step === 1 && (
-          <UploadAttendanceScreenshot onUpload={handleScreenshotUpload} />
+          <SelectDepartment 
+            department={department}
+            onDepartmentChange={handleDepartmentChange}
+          />
         )}
         {step === 2 && (
+          <UploadAttendanceScreenshot onUpload={handleScreenshotUpload} />
+        )}
+        {step === 3 && (
           <SetAttendanceGoal
             desiredAttendance={desiredAttendance}
             onAttendanceGoalChange={handleAttendanceGoalChange}
           />
         )}
-        {step === 3 && (
+        {step === 4 && (
           <DefineTimeFrame
             timeFrame={timeFrame}
             onTimeFrameChange={handleTimeFrameChange}
           />
         )}
-        {step < 3 && (
+        {step < 4 && (
           <div className="flex justify-end mt-4">
             <Button
               className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-black-800 rounded-lg transition duration-200"
               onClick={() => setStep(step + 1)}
-              disabled={step === 1 && !attendanceScreenshot}
+              disabled={step === 1 && !department}
             >
               Next
             </Button>
           </div>
         )}
-        {step === 3 && (
+        {step === 4 && (
           <div className="flex justify-between mt-4">
             <Button
             className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-black-800 rounded-lg transition duration-200"

@@ -2,30 +2,29 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const SelectDepartment = ({ department, semester, onDepartmentChange, onSemesterChange }) => {
+const SelectDepartment = ({ department, onDepartmentChange}) => {
   const departments = [
     { id: 'IT', name: 'Information Technology' },
-    { id: 'CSE', name: 'Computer Science & Engineering' },
-    { id: 'ECE', name: 'Electronics & Communication' },
-    { id: 'ME', name: 'Mechanical Engineering' },
-    { id: 'CE', name: 'Civil Engineering' }
+    { id: 'CSE', name: 'Computer Science Engineering' },
+    { id: 'ECE', name: 'Electronics & Communication Engineering' },
+    // { id: 'CE', name: 'Computer Engineering' }
   ];
 
-  const semesters = Array.from({ length: 8 }, (_, i) => ({
-    id: i + 1,
-    name: `${i + 1}${getSemesterSuffix(i + 1)} Semester`
-  }));
+  // const semesters = Array.from({ length: 8 }, (_, i) => ({
+  //   id: i + 1,
+  //   name: `${i + 1}${getSemesterSuffix(i + 1)} Semester`
+  // }));
 
-  function getSemesterSuffix(num) {
-    if (num === 1) return 'st';
-    if (num === 2) return 'nd';
-    if (num === 3) return 'rd';
-    return 'th';
-  }
+  // function getSemesterSuffix(num) {
+  //   if (num === 1) return 'st';
+  //   if (num === 2) return 'nd';
+  //   if (num === 3) return 'rd';
+  //   return 'th';
+  // }
 
   return (
     <div className="space-y-6 p-6">
-      <h2 className="text-2xl font-bold text-center mb-8">Select Your Department & Semester</h2>
+      <h2 className="text-2xl font-bold text-center mb-8">Select Your Department</h2>
       
       <div className="space-y-4">
         <div className="space-y-2">
@@ -44,7 +43,7 @@ const SelectDepartment = ({ department, semester, onDepartmentChange, onSemester
           </Select>
         </div>
 
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <Label htmlFor="semester">Semester</Label>
           <Select value={semester?.toString()} onValueChange={(value) => onSemesterChange(parseInt(value))}>
             <SelectTrigger className="w-full">
@@ -58,7 +57,7 @@ const SelectDepartment = ({ department, semester, onDepartmentChange, onSemester
               ))}
             </SelectContent>
           </Select>
-        </div>
+        </div> */}
       </div>
     </div>
   );
