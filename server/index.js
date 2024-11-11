@@ -13,6 +13,10 @@ app.use(express.json());
 // Remove multer from here since it's already in the route
 app.use('/api/attendance', attendanceRoutes);
 
+app.get('/', (req, res) => {
+  res.send('OK');
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
