@@ -35,7 +35,7 @@ function parseAttendanceData(text) {
   // console.log('Parsing Attendance Data:', text);
 
   const lines = text.split('\n').filter(line => line.trim());
-  const coursePattern = /(HS|IT|MA)\d+/;
+  const coursePattern = /(HS|IT|MA|CSE|EC)\d+/;
   const attendancePattern = /(\d+)\s*\/\s*(\d+)/;
   const subjectData = [];
   let totalClasses = 0;
@@ -50,7 +50,7 @@ function parseAttendanceData(text) {
         const total = parseInt(attendanceMatch[2]);
 
         if (!isNaN(attended) && !isNaN(total)) {
-          const courseMatch = line.match(/((?:HS|IT|MA)\d+(?:\.\d+)?[A-Z\s/-]+)/);
+          const courseMatch = line.match(/((?:HS|IT|MA|CSE|EC)\d+(?:\.\d+)?[A-Z\s/-]+)/);
           const courseCode = courseMatch ? courseMatch[1].trim() : 'Unknown';
           const type = line.includes('LAB') ? 'LAB' : 'LECT';
 
@@ -84,7 +84,7 @@ function calculateAllowedSkips(department, attendance, desiredPercentage, weeksR
   let weeklySchedule;
   if (department === 'IT') {
     weeklySchedule = {
-      "HS121.02A/HS-3": { lectures: 2, labs: 0 },
+      "HS121.02A/HS-": { lectures: 2, labs: 0 },
       "IT259 / DSA": { lectures: 3, labs: 1 },
       "IT260 / DBMS": { lectures: 3, labs: 1 },
       "IT262 / WT": { lectures: 0, labs: 2 },
@@ -93,7 +93,7 @@ function calculateAllowedSkips(department, attendance, desiredPercentage, weeksR
     };
   } else if (department === 'CSE') {
     weeklySchedule = {
-      "HS121.02A/HS-3": { lectures: 2, labs: 0 },
+      "HS121.02A/HS-": { lectures: 2, labs: 0 },
       "CSE203 / DSA": { lectures: 4, labs: 2 },
       "CSE202 / MCO": { lectures: 3, labs: 1 },
       "CSE204 / PR -": { lectures: 0, labs: 1 },
@@ -102,7 +102,7 @@ function calculateAllowedSkips(department, attendance, desiredPercentage, weeksR
     };
   // } else if (department === 'CE') {
   //   weeklySchedule = {
-  //     "HS121.02A/HS-3": { lectures: 2, labs: 0 },
+  //     "HS121.02A/HS-": { lectures: 2, labs: 0 },
   //     "CE261 / DSA": { lectures: 3, labs: 1 },
   //     "CE271 / COA": { lectures: 3, labs: 1 },
   //     "CE270 / PROJECT-I": { lectures: 0, labs: 2 },
@@ -111,7 +111,7 @@ function calculateAllowedSkips(department, attendance, desiredPercentage, weeksR
   //   };
   } else if (department === 'ECE') {
     weeklySchedule = {
-      "HS121.02A/HS-3": { lectures: 2, labs: 0 },
+      "HS121.02A/HS-": { lectures: 2, labs: 0 },
       "EC253 / EDM": { lectures: 4, labs: 1 },
       "EC260 / DDC": { lectures: 4, labs: 1 },
       "EC261 / CT": { lectures: 2, labs: 1 },
