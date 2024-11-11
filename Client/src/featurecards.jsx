@@ -1,6 +1,6 @@
 import React from 'react';
 import insight from './assets/bulb.png';
-import ocr from './assets/ocr.png';
+import ocr from './assets/OCR.png';
 import plan from './assets/plan.png';
 import { Button } from "@/components/ui/button";
 
