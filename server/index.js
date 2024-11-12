@@ -6,14 +6,29 @@ const app = express();
 const port = 3001 || process.env.PORT;
 
 
+const allowedOrigins = [
+  'https://bunker-baba.netlify.app',
+  /\.bunker-baba\.netlify\.app$/  // This will allow all Netlify preview deployments
+];
 
-app.use(cors({
-  origin: process.env.CLIENT_URL,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Check if the origin is in our allowedOrigins array or matches the regex
+    if (!origin || allowedOrigins.some(allowed => 
+      typeof allowed === 'string' ? allowed === origin : allowed.test(origin)
+    )) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
   optionsSuccessStatus: 200
-}));
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 

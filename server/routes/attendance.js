@@ -7,6 +7,7 @@ const upload = multer();;
 
 router.post('/api/attendance/analyze', upload.single('screenshot'), async (req, res) => {
     try {
+        console.log('Received request:', req.body);
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
         }
