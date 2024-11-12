@@ -1,7 +1,6 @@
 const express = require('express');
 const attendanceRoutes = require('./routes/attendance');
 const cors = require('cors');
-const multer = require('multer');
 
 const app = express();
 const port = 3001 || process.env.PORT;
@@ -9,10 +8,11 @@ const port = 3001 || process.env.PORT;
 
 
 app.use(cors({
-  origin: '*',
+  origin: process.env.CLIENT_URL,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
-  allowedHeaders: ['Content-Type', 'Authorization']
+  optionsSuccessStatus: 200
 }));
 
 app.use(express.json());
