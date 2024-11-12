@@ -51,9 +51,6 @@ const AttendanceCalculator = () => {
     try {
       const response = await fetch(import.meta.env.VITE_API_ENDPOINT, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data', // Add if sending form data
-        },
         body: formData,
       });
 

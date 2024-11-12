@@ -5,7 +5,7 @@ const { extractAttendanceData, calculateAllowedSkips } = require('../utils/ocr.j
 const router = express.Router();
 const upload = multer();;
 
-router.post('/api/attendance/analyze', upload.single('screenshot'), async (req, res) => {
+router.post('/analyze', upload.single('screenshot'), async (req, res) => {
     try {
         console.log('Received request:', req.body);
         if (!req.file) {
