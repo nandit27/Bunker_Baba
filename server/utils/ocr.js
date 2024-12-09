@@ -78,52 +78,9 @@ function parseAttendanceData(text) {
   };
 }
 
-function calculateAllowedSkips(department, attendance, desiredPercentage, weeksRemaining) {
-  // console.log('Calculating Allowed Skips:', attendance);
-  // Weekly schedule for each course
-  let weeklySchedule;
-  if (department === 'IT') {
-    weeklySchedule = {
-      "HS121.02A/HS-": { lectures: 2, labs: 0 },
-      "IT259 / DSA": { lectures: 3, labs: 1 },
-      "IT260 / DBMS": { lectures: 3, labs: 1 },
-      "IT262 / WT": { lectures: 0, labs: 2 },
-      "IT267 / JP": { lectures: 2, labs: 2 },
-      "MA253 / DMA": { lectures: 4, labs: 0 }
-    };
-  } else if (department === 'CSE') {
-    weeklySchedule = {
-      "HS121.02A/HS-": { lectures: 2, labs: 0 },
-      "CSE203 / DSA": { lectures: 4, labs: 2 },
-      "CSE202 / MCO": { lectures: 3, labs: 1 },
-      "CSE204 / PR -": { lectures: 0, labs: 1 },
-      "CSE201 / JP": { lectures: 2, labs: 2 },
-      "MA253 / DMA": { lectures: 4, labs: 0 }
-    };
-  // } else if (department === 'CE') {
-  //   weeklySchedule = {
-  //     "HS121.02A/HS-": { lectures: 2, labs: 0 },
-  //     "CE261 / DSA": { lectures: 3, labs: 1 },
-  //     "CE271 / COA": { lectures: 3, labs: 1 },
-  //     "CE270 / PROJECT-I": { lectures: 0, labs: 2 },
-  //     "CE251 / JP": { lectures: 2, labs: 2 },
-  //     "MA253 / DMA": { lectures: 4, labs: 0 }
-  //   };
-  } else if (department === 'ECE') {
-    weeklySchedule = {
-      "HS121.02A/HS-": { lectures: 2, labs: 0 },
-      "EC253 / EDM": { lectures: 4, labs: 1 },
-      "EC260 / DDC": { lectures: 4, labs: 1 },
-      "EC261 / CT": { lectures: 2, labs: 1 },
-      "EC264 / CS": { lectures: 3, labs: 1 },
-      "EC281.01 / IMP": { lectures: 2, labs: 0 },
-      "MA252 / ": { lectures: 4, labs: 0 }
-    };    
-  } else {
-    throw new Error(Invalid department: ${department});
-  }
+async function calculateAllowedSkips(department, attendance, desiredPercentage, weeksRemaining) {
+  const weeklySchedule = await getWeeklySchedule(department);
 
-  // Extract summary for easier access
   const { totalAttendedClasses: totalAttended, totalClasses } = attendance.summary;
 
   // Process raw attendance data into a structured format
@@ -166,53 +123,17 @@ function calculateAllowedSkips(department, attendance, desiredPercentage, weeksR
     const weeklyClasses = weeklySchedule[courseKey] || { lectures: 0, labs: 0 };
     const futureClassesForCourse = (weeklyClasses.lectures + weeklyClasses.labs) * weeksRemaining;
 
-    return {
-      course,
-      currentAttendance: {
-        lectures: lecturePercentage ? ${lecturePercentage.toFixed(1)}% : 'N/A',
-        labs: labPercentage ? ${labPercentage.toFixed(1)}% : 'N/A'
-      },
-      weeklyClasses,
-      canSkip: (lecturePercentage && lecturePercentage > 85) || (labPercentage && labPercentage > 85),
-      futureClasses: Math.floor(futureClassesForCourse),
-      recommendation: (futureClasses <= additionalClassesNeeded)? "Cannot miss lectures" : getRecommendation(lecturePercentage, labPercentage)
-    };
-  });
-
-  function getRecommendation(lecturePercent, labPercent) {
-    if (lecturePercent === null && labPercent === null) return "No data available";
-    if ((lecturePercent && lecturePercent < 75) || (labPercent && labPercent < 75)) return "Cannot miss lectures";
-    if (lecturePercent > 90 || labPercent > 90) return "Safe to miss some classes";
-    return "Attend if possible";
-  }
-
-  const result = {
+  return {
     summary: {
       currentAttendance: parseFloat(currentPercentage.toFixed(2)),
       totalClassesRemaining: futureClasses,
       requiredAttendance: minimumRequiredAttendance,
       allowedSkips: allowedSkips,
       additionalClassesNeeded
-    },
-    courseWise: recommendations
+    }
   };
-
-  // console.log("\nAttendance Analysis Summary:");
-  // console.table(result.summary);
-
-  // console.log("\nCourse-wise Recommendations:");
-  // console.table(result.courseWise.map(r => ({
-  //   Course: r.course,
-  //   'Current Lectures': r.currentAttendance.lectures,
-  //   'Current Labs': r.currentAttendance.labs,
-  //   'Weekly Classes': ${r.weeklyClasses.lectures} lec, ${r.weeklyClasses.labs} lab,
-  //   'Recommendation': r.recommendation
-  // })));
-
-  return result;
 }
 
-// Make sure to export all required functions
 module.exports = {
   extractAttendanceData,
   calculateAllowedSkips,
