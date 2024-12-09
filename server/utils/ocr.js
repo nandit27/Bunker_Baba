@@ -123,14 +123,28 @@ async function calculateAllowedSkips(department, attendance, desiredPercentage, 
     const weeklyClasses = weeklySchedule[courseKey] || { lectures: 0, labs: 0 };
     const futureClassesForCourse = (weeklyClasses.lectures + weeklyClasses.labs) * weeksRemaining;
 
+    return {
+      summary: {
+        currentAttendance: parseFloat(currentPercentage.toFixed(2)),
+        totalClassesRemaining: futureClasses,
+        requiredAttendance: minimumRequiredAttendance,
+        allowedSkips: allowedSkips,
+        additionalClassesNeeded
+      },
+      // Added recommendations for each course
+      recommendations: {
+        lecturePercentage,
+        labPercentage,
+        futureClassesForCourse
+      }
+    };
+  });
+
+  // Return recommendations along with other data
   return {
-    summary: {
-      currentAttendance: parseFloat(currentPercentage.toFixed(2)),
-      totalClassesRemaining: futureClasses,
-      requiredAttendance: minimumRequiredAttendance,
-      allowedSkips: allowedSkips,
-      additionalClassesNeeded
-    }
+    recommendations,
+    currentPercentage,
+    allowedSkips
   };
 }
 
