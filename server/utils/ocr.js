@@ -110,12 +110,9 @@ function calculateAllowedSkips(department, attendance, desiredPercentage, weeksR
   }, {});
 
   // Calculate future classes based on the weekly schedule
-  const futureClasses = Math.floor(Object.entries(weeklySchedule).reduce((sum, [course, schedule]) => {
-    const matchingCourse = Object.keys(weeklySchedule).find(key => key.includes(course.split('/')[0]));
-    if (matchingCourse) {
-      return sum + (schedule.lectures + schedule.labs);
-    }
-    return sum;
+  const departmentSchedule = weeklySchedule[department];
+  const futureClasses = Math.floor(Object.entries(departmentSchedule).reduce((sum, [_, schedule]) => {
+    return sum + (schedule.lectures + schedule.labs);
   }, 0) * weeksRemaining);
 
   // Calculate current and target metrics
@@ -130,9 +127,9 @@ function calculateAllowedSkips(department, attendance, desiredPercentage, weeksR
     const lecturePercentage = data.LECT.total ? (data.LECT.present / data.LECT.total) * 100 : null;
     const labPercentage = data.LAB.total ? (data.LAB.present / data.LAB.total) * 100 : null;
 
-    // Find matching course in weekly schedule
-    const courseKey = Object.keys(weeklySchedule).find(key => key.includes(course));
-    const weeklyClasses = weeklySchedule[courseKey] || { lectures: 0, labs: 0 };
+    // Find matching course in weekly schedule for the department
+    const courseKey = Object.keys(departmentSchedule).find(key => key.includes(course));
+    const weeklyClasses = courseKey ? departmentSchedule[courseKey] : { lectures: 0, labs: 0 };
     const futureClassesForCourse = (weeklyClasses.lectures + weeklyClasses.labs) * weeksRemaining;
 
     return {
@@ -144,7 +141,7 @@ function calculateAllowedSkips(department, attendance, desiredPercentage, weeksR
       weeklyClasses,
       canSkip: (lecturePercentage && lecturePercentage > 85) || (labPercentage && labPercentage > 85),
       futureClasses: Math.floor(futureClassesForCourse),
-      recommendation: (futureClasses <= additionalClassesNeeded)? "Cannot miss lectures" : getRecommendation(lecturePercentage, labPercentage)
+      recommendation: (futureClassesForCourse <= additionalClassesNeeded) ? "Cannot miss lectures" : getRecommendation(lecturePercentage, labPercentage)
     };
   });
 
