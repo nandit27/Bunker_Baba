@@ -4,10 +4,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 const SelectDepartment = ({ department, onDepartmentChange }) => {
   const departments = [
-    { id: 'IT', name: 'Information Technology' },
-    { id: 'CSE', name: 'Computer Science Engineering' },
-    { id: 'ECE', name: 'Electronics & Communication Engineering' },
-    // { id: 'CE', name: 'Computer Engineering' }
+    { id: '4IT', name: 'Information Technology (Sem 4)' },
+    { id: '6IT', name: 'Information Technology (Sem 6)' },
+    { id: '4CSE', name: 'Computer Science Engineering (Sem 4)' },
+    { id: '6CSE', name: 'Computer Science Engineering (Sem 6)' },
+    { id: '4ECE', name: 'Electronics & Communication Engineering (Sem 4)' },
+    { id: '6ECE', name: 'Electronics & Communication Engineering (Sem 6)' },
+    { id: '4CE', name: 'Computer Engineering (Sem 4)' },
+    { id: '6CE', name: 'Computer Engineering (Sem 6)' }
   ];
 
   // const semesters = Array.from({ length: 8 }, (_, i) => ({

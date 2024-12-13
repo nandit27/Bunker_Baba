@@ -1,28 +1,21 @@
 {
-    "IT": {
-      "HS121.02A/HS-": { "lectures": 2, "labs": 0 },
-      "IT259 / DSA": { "lectures": 3, "labs": 1 },
-      "IT260 / DBMS": { "lectures": 3, "labs": 1 },
-      "IT262 / WT": { "lectures": 0, "labs": 2 },
-      "IT267 / JP": { "lectures": 2, "labs": 2 },
-      "MA253 / DMA": { "lectures": 4, "labs": 0 }
+    "4IT": {
+      "HS131.02A / HSS": { "lectures": 2, "labs": 0 },
+      "IT355 / SNT": { "lectures": 3, "labs": 1 },
+      "IT356 / CAMI": { "lectures": 4, "labs": 1 },
+      "IT357 / CN": { "lectures": 3, "labs": 1 },
+      "IT358 / FSWD": { "lectures": 0, "labs": 1 },
+      "IT359 / DAA": { "lectures": 4, "labs": 1 },
+      "IT360 / SGP": { "lectures": 0, "labs": 1 }
     },
-    "CSE": {
-      "HS121.02A/HS-": { "lectures": 2, "labs": 0 },
-      "CSE203 / DSA": { "lectures": 4, "labs": 2 },
-      "CSE202 / MCO": { "lectures": 3, "labs": 1 },
-      "CSE204 / PR -": { "lectures": 0, "labs": 1 },
-      "CSE201 / JP": { "lectures": 2, "labs": 2 },
-      "MA253 / DMA": { "lectures": 4, "labs": 0 }
-    },
-    "ECE": {
-      "HS121.02A/HS-": { "lectures": 2, "labs": 0 },
-      "EC253 / EDM": { "lectures": 4, "labs": 1 },
-      "EC260 / DDC": { "lectures": 4, "labs": 1 },
-      "EC261 / CT": { "lectures": 2, "labs": 1 },
-      "EC264 / CS": { "lectures": 3, "labs": 1 },
-      "EC281.01 / IMP": { "lectures": 2, "labs": 0 },
-      "MA252 / ": { "lectures": 4, "labs": 0 }
+    "4CE": {
+      "CE262 / DCN": { "lectures": 4, "labs": 1 }, 
+      "CE263 / DBMS": { "lectures": 3, "labs": 2 }, 
+      "CE264 / DAA": { "lectures": 4, "labs": 1 }, 
+      "CE266 / SE": { "lectures": 3, "labs": 1 }, 
+      "CE268 / SGP": { "lectures": 0, "labs": 1 }, 
+      "CE269 / PIP": { "lectures": 0, "labs": 1 }, 
+      "HS111.03 / HSS": { "lectures": 2, "labs": 0 } 
     }
   }
   
