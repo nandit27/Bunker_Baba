@@ -141,7 +141,7 @@ function calculateAllowedSkips(department, attendance, desiredPercentage, weeksR
       weeklyClasses,
       canSkip: (lecturePercentage && lecturePercentage > 85) || (labPercentage && labPercentage > 85),
       futureClasses: Math.floor(futureClassesForCourse),
-      recommendation: (futureClassesForCourse <= additionalClassesNeeded) ? "Cannot miss lectures" : getRecommendation(lecturePercentage, labPercentage)
+      recommendation: (futureClasses <= additionalClassesNeeded) ? "Cannot miss lectures" : getRecommendation(lecturePercentage, labPercentage)
     };
   });
 
