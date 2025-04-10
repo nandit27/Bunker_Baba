@@ -14,19 +14,30 @@ router.post('/analyze', upload.single('screenshot'), async (req, res) => {
 
         const department = req.body.department;
         const imageBuffer = req.file.buffer;
-        const desiredAttendance = parseFloat(req.body.desiredAttendance) || 75;
-        const weeksRemaining = parseInt(req.body.timeFrame) || 4;
+        const desiredAttendance = parseFloat(req.body.desiredAttendance) || 75; // Default to 75%
+        const weeksRemaining = parseInt(req.body.timeFrame) || 4; // Default to 4 weeks
 
+        // Extract attendance data using OCR
         const { parsedData } = await extractAttendanceData(imageBuffer);
 
-        // Calculate allowed skips is now async
-        const skipCalculation = await calculateAllowedSkips(
+        // Calculate allowed skips - just pass weeks remaining
+        const skipCalculation = calculateAllowedSkips(
             department,
             parsedData,
             desiredAttendance,
-            weeksRemaining
+            weeksRemaining  // Just pass the number of weeks
         );
-
+        // console.log({
+        //     summary: skipCalculation.summary,
+        //     courseWise: skipCalculation.courseWise,
+        //     attendanceData: parsedData,
+        //     // ocrResults: ocrResults,
+        //     debug: {
+        //         weeksRemaining,
+        //         desiredAttendance,
+        //         currentAttendance: skipCalculation.summary.currentAttendance
+        //     }
+        // })
         res.json({
             summary: skipCalculation.summary,
             courseWise: skipCalculation.courseWise,
@@ -38,7 +49,7 @@ router.post('/analyze', upload.single('screenshot'), async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Analysis error:', error);
         res.status(500).json({ error: error.message });
     }
 });
