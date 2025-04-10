@@ -1,21 +1,70 @@
 {
-    "4IT": {
-      "HS131.02A / HSS": { "lectures": 2, "labs": 0 },
-      "IT355 / SNT": { "lectures": 3, "labs": 1 },
-      "IT356 / CAMI": { "lectures": 4, "labs": 1 },
-      "IT357 / CN": { "lectures": 3, "labs": 1 },
-      "IT358 / FSWD": { "lectures": 0, "labs": 1 },
-      "IT359 / DAA": { "lectures": 4, "labs": 1 },
-      "IT360 / SGP": { "lectures": 0, "labs": 1 }
-    },
-    "4CE": {
-      "CE262 / DCN": { "lectures": 4, "labs": 1 }, 
-      "CE263 / DBMS": { "lectures": 3, "labs": 2 }, 
-      "CE264 / DAA": { "lectures": 4, "labs": 1 }, 
-      "CE266 / SE": { "lectures": 3, "labs": 1 }, 
-      "CE268 / SGP": { "lectures": 0, "labs": 1 }, 
-      "CE269 / PIP": { "lectures": 0, "labs": 1 }, 
-      "HS111.03 / HSS": { "lectures": 2, "labs": 0 } 
-    }
+  "4IT": {
+    "HS131.02A / HSS": { "lectures": 2, "labs": 0 },
+    "IT355 / SNT": { "lectures": 3, "labs": 1 },
+    "IT356 / CAMI": { "lectures": 4, "labs": 1 },
+    "IT357 / CN": { "lectures": 3, "labs": 1 },
+    "IT358 / FSWD": { "lectures": 0, "labs": 1 },
+    "IT359 / DAA": { "lectures": 4, "labs": 1 },
+    "IT360 / SGP": { "lectures": 0, "labs": 1 }
+  },
+  "4CE": {
+    "CE262 / DCN": { "lectures": 4, "labs": 1 }, 
+    "CE263 / DBMS": { "lectures": 3, "labs": 2 }, 
+    "CE264 / DAA": { "lectures": 4, "labs": 1 }, 
+    "CE266 / SE": { "lectures": 3, "labs": 1 }, 
+    "CE268 / SGP": { "lectures": 0, "labs": 1 }, 
+    "CE269 / PIP": { "lectures": 0, "labs": 1 }, 
+    "HS111.03 / HSS": { "lectures": 2, "labs": 0 } 
+  },
+  "4EC": {
+    "EC263 / CT": {"lectures": 3, "labs": 0},
+    "EC256 / ACA": {"lectures": 4, "labs": 1},
+    "EC257 / MI": {"lectures": 3, "labs": 1},
+    "EC262 / PP": {"lectures": 0, "labs": 2},
+    "EC265": {"lectures": 4, "labs": 0},
+    "EC270 / AR-1": {"lectures": 2, "labs": 0},
+    "HS111.03A": {"lectures": 2, "labs": 0}
+  },
+  "2IT": {
+    "CLUV101": { "lectures": 2, "labs": 0 },
+    "PSUD102": { "lectures": 0, "labs": 1 },
+    "CEUC102": { "lectures": 3, "labs": 2 },
+    "MEUD101": { "lectures": 4, "labs": 1 },
+    "CEUC103": { "lectures": 2, "labs": 1 },
+    "MSUD102": { "lectures": 4, "labs": 0}
+  },
+  "2CE": {
+    "CLUV101": { "lectures": 2, "labs": 0 },
+    "PSUD102": { "lectures": 0, "labs": 1 },
+    "CEUC102": { "lectures": 3, "labs": 2 },
+    "MEUD101": { "lectures": 4, "labs": 1 },
+    "CSUC101": { "lectures": 2, "labs": 1 },
+    "MSUD102": { "lectures": 4, "labs": 0}
+  },
+  "2AIML": {
+    "CLUV101": { "lectures": 2, "labs": 0 },
+    "PSUD102": { "lectures": 0, "labs": 1 },
+    "CEUC102": { "lectures": 3, "labs": 2 },
+    "MEUD101": { "lectures": 4, "labs": 1 },
+    "CSUC101": { "lectures": 2, "labs": 1 },
+    "MSUD102": { "lectures": 4, "labs": 0}
+  },
+  "2CS": {
+    "CLUV101": { "lectures": 2, "labs": 0 },
+    "PSUD102": { "lectures": 0, "labs": 1 },
+    "CEUC102": { "lectures": 3, "labs": 2 },
+    "MEUD101": { "lectures": 4, "labs": 1 },
+    "CSUC101": { "lectures": 3, "labs": 1 },
+    "MSUD102": { "lectures": 4, "labs": 0}
+  },
+  "2EC": {
+    "CLUV101": { "lectures": 2, "labs": 0 },
+    "PSUD102": { "lectures": 0, "labs": 1 },
+    "ECUC104": { "lectures": 3, "labs": 2 },
+    "MEUD101": { "lectures": 4, "labs": 1 },
+    "ECUC103": { "lectures": 2, "labs": 1 },
+    "MSUD102": { "lectures": 4, "labs": 0}
   }
-  
+
+}

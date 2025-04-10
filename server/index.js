@@ -1,39 +1,37 @@
 const express = require('express');
 const attendanceRoutes = require('./routes/attendance');
 const cors = require('cors');
+const connectDB = require('./config/db');
+require('dotenv').config();
+const mongoose = require('mongoose');
 
 const app = express();
 const port = 3001 || process.env.PORT;
 
+// Connect to MongoDB
+connectDB();
 
-const allowedOrigins = [
-  'https://bunker-baba.netlify.app',
-  /\.bunker-baba\.netlify\.app$/  // This will allow all Netlify preview deployments
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Check if the origin is in our allowedOrigins array or matches the regex
-    if (!origin || allowedOrigins.some(allowed => 
-      typeof allowed === 'string' ? allowed === origin : allowed.test(origin)
-    )) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
+// CORS configuration for production
+app.use(cors({
+    origin: [
+        process.env.CLIENT_URL,          // Your Netlify URL
+        'https://bunker-baba.netlify.app', // Add your actual Netlify domain
+        'http://localhost:5173'          // For local development
+    ],
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
 
 app.use(express.json());
 
 // Remove multer from here since it's already in the route
 app.use('/api/attendance', attendanceRoutes);
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', dbConnection: mongoose.connection.readyState === 1 });
+});
 
 app.get('/', (req, res) => {
   res.send('OK');
@@ -46,5 +44,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+    console.log(`Server running on port ${port}`);
 });

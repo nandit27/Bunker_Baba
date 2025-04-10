@@ -52,6 +52,11 @@ const AttendanceCalculator = () => {
       const response = await fetch(import.meta.env.VITE_API_ENDPOINT, {
         method: 'POST',
         body: formData,
+        mode: 'cors',
+        credentials: 'omit',
+        headers: {
+          'Accept': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -62,7 +67,8 @@ const AttendanceCalculator = () => {
       setAttendanceData(data);
     } catch (error) {
       console.error('Error:', error);
-      // Add error handling here
+      // Add user-friendly error message
+      alert('Failed to process attendance data. Please try again.');
     } finally {
       setLoading(false);
     }

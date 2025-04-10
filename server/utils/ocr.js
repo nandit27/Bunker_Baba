@@ -1,6 +1,7 @@
 const Tesseract = require('tesseract.js');
 const path = require('path');
 const fs = require('fs');
+const WeeklySchedule = require('../models/WeeklySchedule');
 
 // Read the weekly schedule data
 const weeklySchedulePath = path.join(__dirname, 'weeklySchedule.json');
@@ -84,11 +85,36 @@ function parseAttendanceData(text) {
   };
 }
 
-function calculateAllowedSkips(department, attendance, desiredPercentage, weeksRemaining) {
+async function getWeeklySchedule(department) {
+  try {
+    const schedule = await WeeklySchedule.findOne({ department });
+    if (!schedule) {
+      throw new Error(`No schedule found for department: ${department}`);
+    }
+    
+    // Convert the array structure back to the original object format
+    const subjects = schedule.subjects.reduce((acc, subject) => {
+      const key = subject.name ? `${subject.code} / ${subject.name}` : subject.code;
+      acc[key] = {
+        lectures: subject.lectures,
+        labs: subject.labs
+      };
+      return acc;
+    }, {});
+
+    return subjects;
+  } catch (error) {
+    console.error('Error fetching schedule:', error);
+    throw error;
+  }
+}
+
+async function calculateAllowedSkips(department, attendance, desiredPercentage, weeksRemaining) {
+  const departmentSchedule = await getWeeklySchedule(department);
   // console.log('Calculating Allowed Skips:', attendance);
   
   // Check if the department exists in the weekly schedule
-  if (!weeklySchedule[department]) {
+  if (!departmentSchedule) {
     throw new Error(`Invalid department: ${department}`);
   }
 
@@ -110,7 +136,6 @@ function calculateAllowedSkips(department, attendance, desiredPercentage, weeksR
   }, {});
 
   // Calculate future classes based on the weekly schedule
-  const departmentSchedule = weeklySchedule[department];
   const futureClasses = Math.floor(Object.entries(departmentSchedule).reduce((sum, [_, schedule]) => {
     return sum + (schedule.lectures + schedule.labs);
   }, 0) * weeksRemaining);
@@ -182,5 +207,6 @@ function calculateAllowedSkips(department, attendance, desiredPercentage, weeksR
 module.exports = {
   extractAttendanceData,
   calculateAllowedSkips,
-  parseAttendanceData
+  parseAttendanceData,
+  getWeeklySchedule
 };
