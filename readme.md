@@ -1,108 +1,131 @@
-# Bunker Baba 📚
+# Bunker Baba - Student Attendance Analysis
 
-A smart attendance management platform for CHARUSAT University students to optimize their lecture attendance strategy.
+Bunker Baba is a comprehensive attendance analysis tool for students. It helps analyze attendance records from screenshots, calculates skip allowances, and provides insights via chat.
 
-## Overview
+## 🏗️ Project Structure
 
-Bunker Baba helps students make informed decisions about which lectures to attend by analyzing their current attendance data from eGovernance screenshots and calculating optimal attendance patterns to meet their target attendance goals.
+The project is organized into three main components:
 
-## Features
+1. **React Frontend** (`Client/`)
+   - React app with Tailwind CSS and Shadcn UI
+   - Uses React Query for API data management
 
-### 📊 Attendance Analysis
-- Upload eGovernance attendance screenshots
-- Automatic parsing of attendance data
-- Subject-wise attendance breakdown
-- Current attendance percentage calculation
+2. **Node.js API Gateway** (`server/`)
+   - Express server acting as an API gateway
+   - Routes requests between frontend and Python backend
+   - Handles attendance data and calculations
 
-### 🎯 Goal Setting
-- Set target attendance percentage
-- Specify timeline/duration to achieve goal
-- Customize priorities for different subjects
+3. **Python Backend** (`python-backend/`)
+   - Flask API for OCR and LLM processing
+   - Uses EasyOCR for text extraction from attendance screenshots
+   - MongoDB integration for data storage
+   - Chat functionality with LLM (placeholder implementation)
 
-### 💡 Smart Recommendations
-- Calculate maximum lectures you can skip
-- Identify must-attend lectures
-- Subject-wise attendance optimization
-- Weekly attendance planning
-- Risk assessment for each skip decision
+## 🚀 Setup & Installation
 
-### 📱 User Interface
-- Clean, modern dashboard
-- Mobile responsive design
-- Easy screenshot upload
-- Interactive attendance planner
-- Visual attendance tracking
+### Prerequisites
 
-## How to Use
+- Node.js (v16+)
+- Python (v3.8+)
+- MongoDB
 
-1. **Upload Attendance Data**
-   - Login to CHARUSAT eGovernance
-   - Take screenshot of attendance page
-   - Upload screenshot to Bunker Baba
-   - Verify extracted attendance data
+### Python Backend
 
-2. **Set Your Goals**
-   - Enter target attendance percentage (e.g. 75%)
-   - Specify achievement timeline
-   - Set subject priorities (optional)
-   - Configure notification preferences
+1. Navigate to the Python backend directory:
+   ```
+   cd python-backend
+   ```
 
-3. **Get Recommendations**
-   - View maximum skippable lectures
-   - See must-attend lectures
-   - Check subject-wise recommendations
-   - Plan your weekly attendance
+2. Create and activate a virtual environment:
+   ```
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-## Technical Requirements
+3. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
 
-### Frontend
-- React.js
-- Tailwind CSS
-- Chart.js for attendance visualization
-- Tesseract.js for OCR
+4. Start the Flask server:
+   ```
+   python app.py
+   ```
+   The server will run on http://localhost:5000.
 
-### Backend
-- Node.js
-- Express.js
+### Node.js Server
 
-### APIs
-- OCR API for screenshot parsing
+1. Navigate to the server directory:
+   ```
+   cd server
+   ```
 
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-## Installation
+3. Start the server:
+   ```
+   npm run dev
+   ```
+   The server will run on http://localhost:3001.
 
-1. Clone the repository:
-```bash
-git clone https://github.com/nandit27/Bunker_Baba.git
+### React Frontend
+
+1. Navigate to the client directory:
+   ```
+   cd Client
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Start the development server:
+   ```
+   npm run dev
+   ```
+   The app will be available at http://localhost:5173.
+
+### Running All Services Together
+
+For convenience, you can use the included script to start all services:
+
 ```
-2. install Dependecies
-#### Frontend (React)
-```bash
-cd client
-npm install
-```
-
-#### Backend (Node.js)
-```bash
-cd ../server
-npm install
-```
-3. Run development server:
-### Start the Backend Server
-
-```bash
-cd server
-npm run dev
-```
-
-### Start the Frontend Development Server
-
-```bash
-cd client
-npm run dev
+./start-servers.sh
 ```
 
+This will start the Python backend, Node.js server, and React frontend concurrently.
 
-## Disclaimer
+## 🛠️ Core Features
 
-This tool is for educational purposes only. Students are responsible for maintaining their required attendance as per university guidelines.
+1. **OCR Processing**
+   - Upload attendance screenshots for analysis
+   - Extract structured data from images
+
+2. **Attendance Analysis**
+   - Calculate current attendance percentage
+   - Determine how many classes you can skip while maintaining target attendance
+
+3. **Chat Assistant**
+   - Ask questions about your attendance
+   - Get insights and recommendations
+
+## 🔄 API Flow
+
+1. Frontend → Node.js API Gateway → Python backend (for OCR/LLM)
+2. Python backend → MongoDB (for data storage)
+3. Python backend → Node.js API Gateway → Frontend (response)
+
+## 🧩 Technology Stack
+
+- **Frontend**: React, Tailwind CSS, Shadcn UI, React Query
+- **API Gateway**: Node.js, Express
+- **Backend Processing**: Python, Flask, EasyOCR
+- **Database**: MongoDB
+
+## 📝 License
+
+This project is open source and available under the [MIT License](LICENSE).

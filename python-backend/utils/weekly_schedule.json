@@ -1,0 +1,20 @@
+{
+    "4IT": {
+      "HS131.02A / HSS": { "lectures": 2, "labs": 0 },
+      "IT355 / SNT": { "lectures": 3, "labs": 1 },
+      "IT356 / CAMI": { "lectures": 4, "labs": 1 },
+      "IT357 / CN": { "lectures": 3, "labs": 1 },
+      "IT358 / FSWD": { "lectures": 0, "labs": 1 },
+      "IT359 / DAA": { "lectures": 4, "labs": 1 },
+      "IT360 / SGP": { "lectures": 0, "labs": 1 }
+    },
+    "4CE": {
+      "CE262 / DCN": { "lectures": 4, "labs": 1 }, 
+      "CE263 / DBMS": { "lectures": 3, "labs": 2 }, 
+      "CE264 / DAA": { "lectures": 4, "labs": 1 }, 
+      "CE266 / SE": { "lectures": 3, "labs": 1 }, 
+      "CE268 / SGP": { "lectures": 0, "labs": 1 }, 
+      "CE269 / PIP": { "lectures": 0, "labs": 1 }, 
+      "HS111.03 / HSS": { "lectures": 2, "labs": 0 } 
+    }
+} 

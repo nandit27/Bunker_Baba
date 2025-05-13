@@ -13,6 +13,26 @@ import UploadAttendanceScreenshot from '../components/UploadAttendanceScreenshot
 import SetAttendanceGoal from '../components/SetAttendanceGoal';
 import DefineTimeFrame from '../components/DefineTimeFrame';
 import SelectDepartment from '../components/SelectDepartment';
+import { useAnalyzeAttendance } from '../services/attendance';
+
+// Helper function to convert timeFrame strings to numbers
+const parseTimeFrame = (value) => {
+  if (typeof value === 'number') return value;
+  
+  const timeValue = String(value).trim().toLowerCase();
+  
+  // Extract numeric part
+  const numericValue = parseInt(timeValue.match(/\d+/)?.[0] || "4", 10);
+  
+  // Convert based on unit
+  if (timeValue.includes('month')) {
+    return numericValue * 4; // 1 month = 4 weeks
+  } else if (timeValue.includes('week')) {
+    return numericValue;
+  } else {
+    return numericValue; // Default to the numeric value
+  }
+};
 
 const AttendanceCalculator = () => {
   const [step, setStep] = useState(1);
@@ -21,7 +41,9 @@ const AttendanceCalculator = () => {
   const [desiredAttendance, setDesiredAttendance] = useState(90);
   const [timeFrame, setTimeFrame] = useState('1 month');
   const [attendanceData, setAttendanceData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  
+  // Use React Query mutation hook
+  const { mutate, isPending } = useAnalyzeAttendance();
 
   const handleDepartmentChange = (value) => {
     setDepartment(value);
@@ -40,32 +62,76 @@ const AttendanceCalculator = () => {
     setTimeFrame(date);
   };
 
-  const calculateAllowedSkips = async () => {
-    setLoading(true);
+  const calculateAllowedSkips = () => {
+    // Parse timeFrame to ensure it's a number
+    const parsedTimeFrame = parseTimeFrame(timeFrame);
+    
     const formData = new FormData();
     formData.append('department', department);
     formData.append('screenshot', attendanceScreenshot);
     formData.append('desiredAttendance', desiredAttendance.toString());
-    formData.append('timeFrame', timeFrame);
+    formData.append('timeFrame', parsedTimeFrame.toString());
 
-    try {
-      const response = await fetch(import.meta.env.VITE_API_ENDPOINT, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    // Use the mutation from React Query
+    mutate(formData, {
+      onSuccess: (data) => {
+        console.log('API Response:', data);
+        
+        // Create a properly formatted data object based on the API response
+        const formattedData = {
+          summary: {
+            currentAttendance: 0,
+            totalClassesRemaining: 0, 
+            additionalClassesNeeded: 0,
+            allowedSkips: 0
+          },
+          courseWise: []
+        };
+        
+        // Extract data from the API response based on the actual structure
+        console.log(data);
+        if (data) {
+          formattedData.summary.currentAttendance = data.attendance.overallPercentage;
+          formattedData.summary.totalClassesRemaining = data.recommendations.summary.futureClasses;
+          formattedData.summary.additionalClassesNeeded = Math.round(data.recommendations.summary.additionalClassesNeeded);
+          formattedData.summary.allowedSkips = Math.round(data.recommendations.summary.allowedSkips);
+          // Transform attendance records into course-wise data
+          if (data.attendance && data.attendance.records && Array.isArray(data.attendance.records)) {
+            formattedData.courseWise = data.attendance.records.map((record) => {
+              // Determine recommendation based on attendance percentage
+              let recommendation = 'No recommendation';
+              const percentage = parseFloat(record.percentage) || 0;
+              
+              if (percentage < 75) {
+                recommendation = 'Cannot miss lectures';
+              } else if (percentage >= 85) {
+                recommendation = 'Safe to miss some classes';
+              } else {
+                recommendation = 'Attend regularly';
+              }
+              
+              const courseType = record.classType || '';
+              const courseName = record.subjectName;
+              
+              return {
+                course: courseName,
+                courseType: courseType, // Keep the original type too
+                recommendation: recommendation,
+                futureClasses: parseInt(record.attended, 10) || 0,
+                percentage: percentage
+              };
+            });
+          }
+        }
+        
+        console.log('Formatted data for display:', formattedData);
+        setAttendanceData(formattedData);
+      },
+      onError: (error) => {
+        console.error('Error:', error);
+        // Add error handling here
       }
-
-      const data = await response.json();
-      setAttendanceData(data);
-    } catch (error) {
-      console.error('Error:', error);
-      // Add error handling here
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   const handleReset = () => {
@@ -77,63 +143,105 @@ const AttendanceCalculator = () => {
     setAttendanceData(null);
   };
 
-  const AttendanceSummary = ({ summary }) => (
-    <div className="space-y-4">
-      <h3 className="text-xl font-semibold">Summary</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-gray-600">Current Attendance</p>
-          <p className="text-2xl font-bold">{summary.currentAttendance.toFixed(1)}%</p>
+  // Render the attendance summary with safe property access
+  const AttendanceSummary = ({ summary }) => {
+    // Check if summary object exists and has the expected properties
+    if (!summary || typeof summary !== 'object') {
+      return (
+        <div className="p-4 bg-yellow-50 rounded-lg">
+          <p className="text-sm text-yellow-600">Summary data is not available.</p>
         </div>
-        <div className="p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-gray-600">Classes Remaining</p>
-          <p className="text-2xl font-bold">{summary.totalClassesRemaining}</p>
-        </div>
-        <div className="p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-gray-600">Additional Classes Needed</p>
-          <p className="text-2xl font-bold">{summary.additionalClassesNeeded}</p>
-        </div>
-        <div className="p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-gray-600">Allowed Skips</p>
-          <p className="text-2xl font-bold">{summary.allowedSkips}</p>
-        </div>
-      </div>
-    </div>
-  );
+      );
+    }
 
-  const CourseWiseAnalysis = ({ courses }) => (
-    <div className="mt-8">
-      <h3 className="text-xl font-semibold mb-4">Course-wise Analysis</h3>
+    return (
       <div className="space-y-4">
-        {courses.map((course, index) => (
-          <div
-            key={index}
-            className={`p - 4 rounded - lg border ${course.recommendation === "Cannot miss lectures"
-                ? 'border-red-200 bg-red-50'
-                : course.recommendation === "Safe to miss some classes"
-                  ? 'border-green-200 bg-green-50'
-                  : 'border-gray-200 bg-gray-50'
-              }`}
-          >
-            <div className="flex justify-between items-center">
-              <h4 className="font-semibold">{course.course}</h4>
-              <span className={`px - 3 py - 1 rounded - full text - sm ${course.recommendation === "Cannot miss lectures"
-                  ? 'bg-red-100 text-red-800'
-                  : course.recommendation === "Safe to miss some classes"
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
-                {course.recommendation}
-              </span>
-            </div>
-            <div className="mt-2 text-sm text-gray-600">
-              <p>Future Classes: {course.futureClasses}</p>
-            </div>
+        <h3 className="text-xl font-semibold">Summary</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <p className="text-sm text-gray-600">Current Attendance</p>
+            <p className="text-2xl font-bold">
+              {summary.currentAttendance}%
+            </p>
           </div>
-        ))}
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <p className="text-sm text-gray-600">Classes Remaining</p>
+            <p className="text-2xl font-bold">
+              {summary.totalClassesRemaining}
+            </p>
+          </div>
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <p className="text-sm text-gray-600">Additional Classes Needed</p>
+            <p className="text-2xl font-bold">
+              {summary.additionalClassesNeeded}
+            </p>
+          </div>
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <p className="text-sm text-gray-600">Allowed Skips</p>
+            <p className="text-2xl font-bold">
+              {summary.allowedSkips}
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  // Render the course-wise analysis with safe property access
+  const CourseWiseAnalysis = ({ courses }) => {
+    // Check if courses array exists and is not empty
+    if (!courses || !Array.isArray(courses) || courses.length === 0) {
+      return (
+        <div className="mt-8">
+          <h3 className="text-xl font-semibold mb-4">Course-wise Analysis</h3>
+          <div className="p-4 bg-yellow-50 rounded-lg">
+            <p className="text-sm text-yellow-600">Course data is not available.</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold mb-4">Course-wise Analysis</h3>
+        <div className="space-y-4">
+          {courses.map((course, index) => (
+            <div
+              key={index}
+              className={`p-4 rounded-lg border ${
+                course.recommendation === "Cannot miss lectures"
+                  ? 'border-red-200 bg-red-50'
+                  : course.recommendation === "Safe to miss some classes"
+                    ? 'border-green-200 bg-green-50'
+                    : 'border-gray-200 bg-gray-50'
+              }`}
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <h4 className="font-semibold text-lg">{course.course || 'Unknown Course'}</h4>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Current Attendance: <span className="font-medium">{course.percentage !== undefined ? course.percentage : 'N/A'}%</span>
+                  </p>
+                </div>
+                <span className={`px-3 py-1 rounded-full text-sm ${
+                  course.recommendation === "Cannot miss lectures"
+                    ? 'bg-red-100 text-red-800'
+                    : course.recommendation === "Safe to miss some classes"
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {course.recommendation || 'No recommendation'}
+                </span>
+              </div>
+              <div className="mt-2 text-sm text-gray-600">
+                <p>Classes Attended: {course.futureClasses !== undefined ? course.futureClasses : 'N/A'}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -182,9 +290,9 @@ const AttendanceCalculator = () => {
             <Button
               className="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition duration-200"
               onClick={calculateAllowedSkips}
-              disabled={loading}
+              disabled={isPending}
             >
-              {loading ? <Loader className="animate-spin" /> : 'Calculate'}
+              {isPending ? <Loader className="animate-spin" /> : 'Calculate'}
             </Button>
           </div>
         )}
