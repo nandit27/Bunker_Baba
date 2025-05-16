@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 # Import routes
 from routes.ocr_route import ocr_bp
+from routes.skip_planner_route import skip_planner_bp
 
 # Load environment variables
 load_dotenv()
@@ -31,6 +32,7 @@ CORS(app, resources={
 
 # Register blueprints
 app.register_blueprint(ocr_bp, url_prefix='/api')
+app.register_blueprint(skip_planner_bp, url_prefix='/api')
 
 @app.route('/', methods=['GET'])
 def index():

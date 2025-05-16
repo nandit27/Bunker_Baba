@@ -14,14 +14,14 @@ const DefineTimeFrame = ({ timeFrame, onTimeFrameChange }) => {
   ];
 
   return (
-    <div className="p-8 bg-white rounded-2xl shadow-lg">
-      <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-        <Clock className="w-6 h-6" />
+    <div className="p-8">
+      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+        <Clock className="w-6 h-6 text-indigo-600" />
         Choose Your Timeline
       </h2>
       
-      <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6">
-        <div className="grid grid-cols-2 gap-4">
+      <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {timeFrames.map((frame) => (
             <button
               key={frame.value}
@@ -29,11 +29,20 @@ const DefineTimeFrame = ({ timeFrame, onTimeFrameChange }) => {
                 setSelectedAnimation(frame.value);
                 setTimeout(() => onTimeFrameChange(frame.value), 300);
               }}
-              className={`p-6 rounded-xl text-center transition-all duration-300 ${
+              className={`p-5 rounded-xl text-center transition-all duration-300 border ${
                 timeFrame === frame.value
-                  ? 'bg-gradient-to-r from-black to-gray-800 text-white shadow-lg scale-105'
-                  : 'bg-white text-gray-900 hover:bg-gray-50'
-              } ${selectedAnimation === frame.value ? 'animate-wiggle' : ''}`}
+                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg scale-105 border-transparent'
+                  : 'bg-white text-gray-800 hover:border-indigo-200 hover:shadow-md border-gray-100'
+              } ${selectedAnimation === frame.value ? 'animate-pulse' : ''}`}
+              aria-label={`Select ${frame.label}`}
+              tabIndex="0"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setSelectedAnimation(frame.value);
+                  setTimeout(() => onTimeFrameChange(frame.value), 300);
+                }
+              }}
             >
               <div className="text-3xl mb-2">{frame.icon}</div>
               <div className="font-medium">{frame.value}</div>
@@ -43,13 +52,13 @@ const DefineTimeFrame = ({ timeFrame, onTimeFrameChange }) => {
         </div>
         
         {/* Timeline Visualization */}
-        <div className="mt-8 p-4 bg-white rounded-lg border border-gray-200">
+        <div className="mt-8 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-100">
           <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-gray-600" />
+            <Calendar className="w-5 h-5 text-indigo-600" />
             <span className="text-gray-900 font-medium">Your Journey:</span>
             <span className="text-gray-800">Today</span>
-            <ArrowRight className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-800 font-medium">{timeFrame} later</span>
+            <ArrowRight className="w-4 h-4 text-purple-400" />
+            <span className="text-indigo-600 font-medium">{timeFrame} later</span>
           </div>
         </div>
       </div>
