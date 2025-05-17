@@ -19,7 +19,7 @@ const LandingPage = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -37,23 +37,23 @@ const LandingPage = () => {
             </div>
             <span className="ml-2 text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Bunker Baba</span>
           </div>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            <button 
+            <button
               className="flex items-center gap-1 text-gray-700 hover:text-indigo-600 transition-colors"
               onClick={() => navigate('/')}
             >
               <span>Home</span>
             </button>
-            <button 
+            <button
               className="flex items-center gap-1 text-gray-700 hover:text-indigo-600 transition-colors"
               onClick={() => navigate('/calculator')}
             >
               <Calculator className="w-4 h-4" />
               <span>Attendance Calculator</span>
             </button>
-            <button 
+            <button
               className="flex items-center gap-1 text-gray-700 hover:text-indigo-600 transition-colors"
               onClick={() => navigate('/skip-planner')}
             >
@@ -67,7 +67,7 @@ const LandingPage = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
+          <button
             className="md:hidden p-2 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
@@ -80,7 +80,7 @@ const LandingPage = () => {
         {isMenuOpen && (
           <div className="absolute top-full left-0 right-0 bg-white shadow-lg md:hidden z-50">
             <div className="py-2 px-4 max-w-7xl mx-auto">
-              <button 
+              <button
                 className="w-full text-left flex items-center gap-2 py-3 text-gray-700 hover:text-indigo-600 transition-colors border-b border-gray-100"
                 onClick={() => {
                   navigate('/');
@@ -89,7 +89,7 @@ const LandingPage = () => {
               >
                 <span>Home</span>
               </button>
-              <button 
+              <button
                 className="w-full text-left flex items-center gap-2 py-3 text-gray-700 hover:text-indigo-600 transition-colors border-b border-gray-100"
                 onClick={() => {
                   navigate('/calculator');
@@ -99,7 +99,7 @@ const LandingPage = () => {
                 <Calculator className="w-4 h-4" />
                 <span>Attendance Calculator</span>
               </button>
-              <button 
+              <button
                 className="w-full text-left flex items-center gap-2 py-3 text-gray-700 hover:text-indigo-600 transition-colors border-b border-gray-100"
                 onClick={() => {
                   navigate('/skip-planner');
@@ -122,9 +122,9 @@ const LandingPage = () => {
       <main className="container mx-auto px-4 text-center pt-24 pb-20">
         <div className="relative flex justify-center mb-8 md:mb-12">
           <div className="absolute w-64 h-64 md:w-96 md:h-96 bg-gradient-to-r from-indigo-200/30 to-purple-200/30 rounded-full blur-3xl"></div>
-          <img 
+          <img
             src={baba}
-            alt="Zen character" 
+            alt="Zen character"
             className="w-64 h-64 md:w-96 md:h-96 object-contain relative animate-float z-10"
           />
         </div>
@@ -139,14 +139,14 @@ const LandingPage = () => {
         </p>
 
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Button 
+          <Button
             className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-md transition-all duration-200 text-base"
             onClick={() => navigate('/calculator')}
           >
             <Calculator className="w-5 h-5 mr-2" />
             Calculate Attendance
           </Button>
-          <Button 
+          <Button
             className="px-6 py-3 bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 rounded-xl shadow-sm transition-all duration-200 text-base"
             onClick={() => navigate('/skip-planner')}
           >
@@ -158,7 +158,7 @@ const LandingPage = () => {
 
       {/* Second Section */}
       <SecondSection />
-      
+
       {/* Feature Cards */}
       <FeatureCards />
 
@@ -170,7 +170,7 @@ const LandingPage = () => {
 
       {/* Footer */}
       <Footer />
-   
+
     </div>
   );
 };

@@ -112,16 +112,17 @@ class AttendanceCalculator:
             logger.error(f"Error calculating allowed skips: {str(e)}")
             raise
 
-    def _get_recommendation(self, lecture_percent: float, lab_percent: float, 
+    def _get_recommendation(self, lecture_percent: float, lab_percent: float,
                           cannot_miss: bool) -> str:
         """Generate recommendation based on attendance percentages"""
         if cannot_miss:
             return "Cannot miss lectures"
         if lecture_percent is None and lab_percent is None:
             return "No data available"
-        if ((lecture_percent and lecture_percent < 75) or 
-            (lab_percent and lab_percent < 75)):
+        if ((lecture_percent is not None and lecture_percent < 75) or
+            (lab_percent is not None and lab_percent < 75)):
             return "Cannot miss lectures"
-        if lecture_percent > 90 or lab_percent > 90:
+        if ((lecture_percent is not None and lecture_percent > 90) or
+            (lab_percent is not None and lab_percent > 90)):
             return "Safe to miss some classes"
-        return "Attend if possible" 
+        return "Attend if possible"
