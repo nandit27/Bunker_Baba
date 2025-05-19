@@ -6,6 +6,7 @@ import { useChat } from '../services/chat';
 import { useAttendance } from '../context/AttendanceContext';
 import { Send, Loader, User, X, Maximize, Minimize } from 'lucide-react';
 import baba from '../assets/baba.png';
+import TypewriterEffect from './Effect.jsx';
 
 const ChatBubble = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,10 +19,10 @@ const ChatBubble = () => {
   const { attendanceData } = useAttendance();
   const studentId = '123'; // Default student ID
   const [prevAttendanceData, setPrevAttendanceData] = useState(null);
+  const [isTyping, setIsTyping] = useState(false);
 
-  // Define toggle functions first using useCallback
+  // Toggle chat open/close state
   const toggleChat = useCallback(() => {
-    // When closing, also exit full window mode
     if (isOpen && isFullWindow) {
       setIsFullWindow(false);
     }
@@ -31,18 +32,17 @@ const ChatBubble = () => {
     }
   }, [isOpen, isFullWindow]);
 
-
-
+  // Toggle between normal and full window mode
   const toggleFullWindow = useCallback((e) => {
     e.stopPropagation();
     setIsFullWindow(!isFullWindow);
     setIsMinimized(false);
   }, [isFullWindow]);
 
+  // Handle sending a new message
   const handleSendMessage = () => {
     if (!message.trim()) return;
 
-    // Clean user message before adding to chat history
     const cleanedMessage = cleanMessageContent(message);
 
     // Add user message to chat history
@@ -58,13 +58,11 @@ const ChatBubble = () => {
       context: {}
     };
 
-    // Send message to API
     sendMessage(chatData);
-
-    // Clear input
     setMessage('');
   };
 
+  // Handle Enter key press to send message
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -85,34 +83,25 @@ const ChatBubble = () => {
   const cleanMessageContent = (content) => {
     if (!content) return '';
 
-    // Process the content to remove markdown formatting
     let cleanedContent = content;
-
-    // Remove markdown asterisks for bold/italic formatting
     cleanedContent = cleanedContent.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
-
-    // Remove markdown backticks for code blocks
     cleanedContent = cleanedContent.replace(/```(.*?)```/gs, '$1').replace(/`(.*?)`/g, '$1');
-
-    // Remove markdown for headers
     cleanedContent = cleanedContent.replace(/#{1,6}\s+(.*?)(?:\n|$)/g, '$1\n');
-
-    // Remove markdown for lists
     cleanedContent = cleanedContent.replace(/^\s*[-*+]\s+(.*?)(?:\n|$)/gm, '$1\n');
     cleanedContent = cleanedContent.replace(/^\s*\d+\.\s+(.*?)(?:\n|$)/gm, '$1\n');
+    cleanedContent = cleanedContent.split('\n').map(line => line.trim()).join('\n');
 
     return cleanedContent;
   };
 
-  // Update chat history when response is received
+  // Handle new responses from the chat API
   useEffect(() => {
     if (data?.success) {
-      // Clean the response text from markdown formatting
       const cleanedResponse = cleanMessageContent(data.response);
-
+      setIsTyping(true);
       setChatHistory(prev => [
         ...prev,
-        { role: 'assistant', content: cleanedResponse }
+        { role: 'assistant', content: '', fullContent: cleanedResponse, isTyping: true }
       ]);
     }
   }, [data]);
@@ -129,17 +118,14 @@ const ChatBubble = () => {
     return () => window.removeEventListener('keydown', handleEscapeKey);
   }, [isOpen, isFullWindow, toggleChat]);
 
-  // Check if attendance data has been updated
+  // Reset chat history when attendance data changes
   useEffect(() => {
-    // If we had no data before but now we do, or if the data has changed
     if ((!prevAttendanceData && attendanceData) ||
         (prevAttendanceData && attendanceData &&
          JSON.stringify(prevAttendanceData) !== JSON.stringify(attendanceData))) {
-      // Reset chat history when new attendance data is added
       setChatHistory([]);
     }
 
-    // Update the previous attendance data reference
     setPrevAttendanceData(attendanceData);
   }, [attendanceData]);
 
@@ -151,13 +137,13 @@ const ChatBubble = () => {
     "How many classes do I need to attend to reach 85% attendance?"
   ];
 
+  // Set the input field to a sample question when clicked
   const handleSampleQuestion = (question) => {
     setMessage(question);
   };
 
   return (
     <div className={`${isFullWindow ? 'fixed inset-0 z-50 bg-gray-50 overflow-hidden' : 'fixed bottom-4 right-4 z-50'}`}>
-      {/* Chat Bubble Button */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -172,8 +158,6 @@ const ChatBubble = () => {
           </motion.button>
         )}
       </AnimatePresence>
-
-      {/* Chat Window */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -183,7 +167,6 @@ const ChatBubble = () => {
             className={`${isFullWindow ? 'fixed inset-0 m-0 z-50 overflow-hidden' : 'absolute bottom-0 right-0'}`}
           >
             <Card className={`bg-white shadow-lg border border-gray-100 rounded-xl overflow-hidden ${isFullWindow ? 'w-full h-full max-w-screen-xl mx-auto flex flex-col' : 'w-80 md:w-96'}`}>
-              {/* Chat Header */}
               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-3 flex items-center justify-between sticky top-0 z-10">
                 <div className="flex items-center">
                   <div className="bg-white/20 p-1.5 rounded-full">
@@ -278,7 +261,25 @@ Seedha Baba se karo baat!!😎 {!attendanceData && "Please calculate your attend
                                 : 'bg-gray-100 text-gray-800'
                             }`}
                           >
-                            <p className={`whitespace-pre-wrap ${isFullWindow ? 'text-base' : 'text-sm'}`}>{chat.content}</p>
+                            {chat.role === 'assistant' && chat.isTyping ? (
+                              <TypewriterEffect
+                                text={chat.fullContent}
+                                speed={15}
+                                className={`whitespace-pre-wrap ${isFullWindow ? 'text-base' : 'text-sm'}`}
+                                onComplete={() => {
+                                  setChatHistory(prev =>
+                                    prev.map((item, i) =>
+                                      i === index
+                                        ? { ...item, isTyping: false, content: item.fullContent }
+                                        : item
+                                    )
+                                  );
+                                  setIsTyping(false);
+                                }}
+                              />
+                            ) : (
+                              <p className={`whitespace-pre-wrap ${isFullWindow ? 'text-base' : 'text-sm'}`}>{chat.content}</p>
+                            )}
                           </div>
 
                           {chat.role === 'user' && (

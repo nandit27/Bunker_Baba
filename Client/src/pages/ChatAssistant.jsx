@@ -8,6 +8,7 @@ import { useChat } from '../services/chat';
 import { useAttendance } from '../context/AttendanceContext';
 import { useNavigate } from 'react-router-dom';
 import { Send, Loader, Bot, User, Info, Calculator, PlaneTakeoff } from 'lucide-react';
+import TypewriterEffect from '../components/Effect.jsx';
 
 const ChatAssistant = () => {
   const [message, setMessage] = useState('');
@@ -15,7 +16,9 @@ const ChatAssistant = () => {
   const chatContainerRef = useRef(null);
   const { sendMessage, isPending, data } = useChat();
   const { attendanceData } = useAttendance();
-  const [studentId, setStudentId] = useState('123'); // Default student ID
+  // Student ID for API requests
+  const [studentId, setStudentId] = useState('123');
+  const [isTyping, setIsTyping] = useState(false);
   const navigate = useNavigate();
 
   // Scroll to bottom of chat when new messages are added
@@ -25,44 +28,60 @@ const ChatAssistant = () => {
     }
   }, [chatHistory]);
 
-  // Update chat history when response is received
+  // Handle new responses from the chat API
   useEffect(() => {
-    if (data && data.success) {
+    if (data?.success) {
+      const cleanedResponse = cleanMessageContent(data.response);
+      setIsTyping(true);
       setChatHistory(prev => [
         ...prev,
-        { role: 'assistant', content: data.response }
+        { role: 'assistant', content: '', fullContent: cleanedResponse, isTyping: true }
       ]);
     }
   }, [data]);
 
+  // Handle sending a new message
   const handleSendMessage = () => {
     if (!message.trim()) return;
 
-    // Add user message to chat history
     setChatHistory(prev => [
       ...prev,
       { role: 'user', content: message }
     ]);
 
-    // Prepare data for API
     const chatData = {
       message,
       student_id: studentId,
       context: {}
     };
 
-    // Send message to API
     sendMessage(chatData);
-
-    // Clear input
     setMessage('');
   };
 
+  // Handle Enter key press to send message
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  // Clean message content from markdown formatting
+  const cleanMessageContent = (content) => {
+    if (!content) return '';
+
+    let cleanedContent = content;
+
+    // Remove markdown formatting
+    cleanedContent = cleanedContent.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
+    cleanedContent = cleanedContent.replace(/```(.*?)```/gs, '$1').replace(/`(.*?)`/g, '$1');
+    cleanedContent = cleanedContent.replace(/#{1,6}\s+(.*?)(?:\n|$)/g, '$1\n');
+    cleanedContent = cleanedContent.replace(/^\s*[-*+]\s+(.*?)(?:\n|$)/gm, '$1\n');
+    cleanedContent = cleanedContent.replace(/^\s*\d+\.\s+(.*?)(?:\n|$)/gm, '$1\n');
+    cleanedContent = cleanedContent.split('\n').map(line => line.trim()).join('\n');
+
+    return cleanedContent;
   };
 
   // Sample questions for the user to try
@@ -74,6 +93,7 @@ const ChatAssistant = () => {
     "How many total classes have been conducted so far?"
   ];
 
+  // Set the input field to a sample question when clicked
   const handleSampleQuestion = (question) => {
     setMessage(question);
   };
@@ -90,7 +110,7 @@ const ChatAssistant = () => {
           className="max-w-4xl mx-auto"
         >
           <h1 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            Bunker Baba 
+            Bunker Baba
           </h1>
           <p className="text-gray-600 text-center mb-8">
             Ask questions about your attendance and get instant answers
@@ -129,7 +149,6 @@ const ChatAssistant = () => {
           )}
 
           <Card className="bg-white shadow-lg border border-gray-100 rounded-xl overflow-hidden">
-            {/* Chat Header */}
             <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4">
               <div className="flex items-center">
                 <div className="bg-white/20 p-2 rounded-full">
@@ -138,13 +157,10 @@ const ChatAssistant = () => {
                 <h2 className="ml-3 text-white font-medium">Bunker Baba </h2>
               </div>
             </div>
-
-            {/* Chat Messages */}
             <div
               ref={chatContainerRef}
               className="p-4 h-[400px] overflow-y-auto space-y-4"
             >
-              {/* Welcome Message */}
               {chatHistory.length === 0 && (
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-indigo-50 border border-indigo-100">
                   <div className="bg-indigo-100 p-2 rounded-full">
@@ -170,8 +186,6 @@ Seedha Baba se karo baat! {!attendanceData && "Please calculate your attendance 
                   </div>
                 </div>
               )}
-
-              {/* Chat Messages */}
               {chatHistory.map((chat, index) => (
                 <div
                   key={index}
@@ -194,7 +208,25 @@ Seedha Baba se karo baat! {!attendanceData && "Please calculate your attendance 
                         : 'bg-gray-100 text-gray-800'
                     }`}
                   >
-                    <p className="whitespace-pre-wrap">{chat.content}</p>
+                    {chat.role === 'assistant' && chat.isTyping ? (
+                      <TypewriterEffect
+                        text={chat.fullContent}
+                        speed={15}
+                        className="whitespace-pre-wrap"
+                        onComplete={() => {
+                          setChatHistory(prev =>
+                            prev.map((item, i) =>
+                              i === index
+                                ? { ...item, isTyping: false, content: item.fullContent }
+                                : item
+                            )
+                          );
+                          setIsTyping(false);
+                        }}
+                      />
+                    ) : (
+                      <p className="whitespace-pre-wrap">{chat.content}</p>
+                    )}
                   </div>
 
                   {chat.role === 'user' && (
@@ -204,8 +236,6 @@ Seedha Baba se karo baat! {!attendanceData && "Please calculate your attendance 
                   )}
                 </div>
               ))}
-
-              {/* Loading indicator */}
               {isPending && (
                 <div className="flex items-start gap-3">
                   <div className="bg-indigo-100 p-2 rounded-full">
@@ -221,7 +251,6 @@ Seedha Baba se karo baat! {!attendanceData && "Please calculate your attendance 
               )}
             </div>
 
-            {/* Chat Input */}
             <div className="p-4 border-t border-gray-200">
               <div className="flex gap-2">
                 <Input
