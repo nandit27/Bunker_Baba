@@ -22,20 +22,17 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Set up CORS
-CORS(app, resources={
-    r"/*": {
-        "origins": [
-            "https://bunker-baba.netlify.app",
-            "http://localhost:5173",
-            "http://127.0.0.1:5173"
-        ],
-        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"],
-        "supports_credentials": True,
-        "max_age": timedelta(hours=1)
-    }
-})
-
+CORS(app,
+     resources={r"/*": {"origins": [
+         "https://bunker-baba.netlify.app",
+         "http://localhost:5173",
+         "http://127.0.0.1:5173"
+     ]}},
+     supports_credentials=True,
+     methods=["GET", "POST", "OPTIONS", "PUT", "DELETE"],
+     allow_headers=["Content-Type", "Authorization"],
+     max_age=timedelta(hours=1)
+)
 # Register blueprints
 app.register_blueprint(ocr_bp, url_prefix='/api')
 app.register_blueprint(skip_planner_bp, url_prefix='/api')
