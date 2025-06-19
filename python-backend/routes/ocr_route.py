@@ -24,7 +24,7 @@ attendance_calculator = AttendanceCalculator()
 weekly_schedule = WeeklySchedule()
 attendance_record = AttendanceRecord()
 
-@ocr_bp.route('/analyze', methods=['POST'])
+@ocr_bp.route('/analyze', methods=['POST','OPTIONS'])
 def analyze_attendance():
     """
     Endpoint to process OCR on attendance screenshots and calculate recommendations
