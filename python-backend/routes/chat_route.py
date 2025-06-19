@@ -22,7 +22,7 @@ api_key = os.environ.get('GEMINI_API_KEY')
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel('gemini-2.0-flash')
 
-@chat_bp.route('/chat', methods=['POST','OPTIONS])
+@chat_bp.route('/chat', methods=['POST','OPTIONS'])
 def chat():
     """
     Endpoint to handle chat messages related to attendance
