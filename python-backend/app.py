@@ -27,7 +27,11 @@ CORS(app, resources={
             "https://bunker-baba.netlify.app",
             "http://localhost:5173",
             "http://127.0.0.1:5173"
-        ]
+        ],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True,
+        "max_age": timedelta(hours=1)
     }
 })
 
